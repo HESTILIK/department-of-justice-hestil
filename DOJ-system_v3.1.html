@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DEPARTMENT OF JUSTICE — System Administracji Stanowej</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0e14;
+  --sidebar:#0c1119;
+  --sidebar-hov:#151d2b;
+  --panel:#1b2432;
+  --panel-head:#161e2a;
+  --panel-alt:#212b3a;
+  --panel-row:#25303f;
+  --panel-row-alt:#212a38;
+  --border:#2e3a4c;
+  --border-soft:#232d3d;
+  --text:#e6ecf4;
+  --text-dim:#8b98ab;
+  --text-faint:#5c6a7f;
+  --gold:#c9a24a;
+  --gold-dim:#8a7136;
+  --green:#3ea86b;
+  --green-bg:#173428;
+  --red:#d1554c;
+  --red-bg:#3a1e1e;
+  --amber:#d0973f;
+  --amber-bg:#3a2c17;
+  --blue:#4a8fd6;
+  --purple:#9d7fd6;
+  --purple-bg:#241c3a;
+  --radius:2px;
+  --font-mono:'IBM Plex Mono',monospace;
+  --font-sans:'Inter',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-sans);-webkit-font-smoothing:antialiased;overflow:hidden;}
+::selection{background:var(--gold-dim);color:#fff;}
+::-webkit-scrollbar{width:10px;height:10px;}
+::-webkit-scrollbar-track{background:var(--panel);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+::-webkit-scrollbar-thumb:hover{background:var(--text-faint);}
+button{font-family:inherit;cursor:pointer;border:none;outline:none;}
+input,select,textarea{font-family:inherit;outline:none;}
+a{color:var(--gold);text-decoration:none;}
+
+/* ============ LOGIN ============ */
+#login-screen{position:fixed;inset:0;background:radial-gradient(ellipse at top left,#101a28 0%,transparent 55%),radial-gradient(ellipse at bottom right,#14202f 0%,transparent 55%),var(--bg);display:flex;align-items:center;justify-content:center;z-index:500;}
+#login-screen::before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--border-soft) 1px,transparent 1px),linear-gradient(90deg,var(--border-soft) 1px,transparent 1px);background-size:42px 42px;opacity:.18;pointer-events:none;}
+.login-card{position:relative;width:420px;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 30px 80px -20px rgba(0,0,0,.7);overflow:hidden;}
+.login-topline{height:3px;background:linear-gradient(90deg,var(--gold-dim),var(--gold),var(--gold-dim));}
+.login-body{padding:44px 40px 36px;}
+.login-seal{width:64px;height:64px;margin:0 auto 18px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#2a3547,#10161f);border:2px solid var(--gold-dim);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-weight:700;font-size:20px;color:var(--gold);}
+.login-title{text-align:center;font-family:var(--font-mono);font-weight:700;font-size:15px;letter-spacing:2.5px;color:var(--text);margin-bottom:4px;}
+.login-sub{text-align:center;font-size:11.5px;letter-spacing:1.5px;color:var(--text-dim);text-transform:uppercase;margin-bottom:30px;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:10.5px;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px;font-weight:600;}
+.field input,.field select,.field textarea{width:100%;background:var(--panel-alt);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:11px 12px;font-size:13.5px;transition:border-color .15s;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold-dim);}
+.btn-primary{width:100%;background:linear-gradient(180deg,#c9a24a,#a9823a);color:#1a1204;font-weight:700;letter-spacing:1px;font-size:12.5px;text-transform:uppercase;padding:13px;border-radius:var(--radius);margin-top:6px;transition:filter .15s,transform .1s;}
+.btn-primary:hover{filter:brightness(1.08);}
+.btn-primary:active{transform:scale(.99);}
+.login-error{background:var(--red-bg);border:1px solid #5c2a26;color:#f0a29c;font-size:12px;padding:9px 12px;border-radius:var(--radius);margin-bottom:14px;display:none;}
+.login-hint{margin-top:22px;padding-top:18px;border-top:1px solid var(--border-soft);font-size:11px;color:var(--text-faint);line-height:1.7;}
+.login-hint b{color:var(--text-dim);}
+.login-foot{text-align:center;padding:14px;font-size:10px;letter-spacing:1px;color:var(--text-faint);border-top:1px solid var(--border-soft);background:var(--panel-head);}
+
+/* ============ APP SHELL ============ */
+#app{position:fixed;inset:0;display:none;flex-direction:column;}
+#app.active{display:flex;}
+.topbar{height:52px;flex:none;background:var(--sidebar);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 18px;gap:14px;}
+.topbar-seal{width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#2a3547,#10161f);border:1.5px solid var(--gold-dim);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:10px;font-weight:700;color:var(--gold);flex:none;}
+.topbar-title{font-family:var(--font-mono);font-weight:600;font-size:13px;letter-spacing:1.5px;}
+.topbar-title span{color:var(--gold);}
+.topbar-clock{font-family:var(--font-mono);font-size:11.5px;color:var(--text-dim);margin-left:6px;padding-left:14px;border-left:1px solid var(--border);}
+.topbar-spacer{flex:1;}
+.topbar-user{display:flex;align-items:center;gap:10px;}
+.topbar-user-info{text-align:right;line-height:1.3;}
+.topbar-user-name{font-size:12.5px;font-weight:600;}
+.topbar-user-role{font-size:10px;color:var(--gold);letter-spacing:.5px;}
+.topbar-avatar{width:30px;height:30px;border-radius:50%;background:var(--panel-alt);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text-dim);}
+.btn-logout{background:var(--panel-alt);border:1px solid var(--border);color:var(--text-dim);font-size:11px;padding:7px 12px;border-radius:var(--radius);letter-spacing:.5px;transition:all .15s;}
+.btn-logout:hover{background:var(--red-bg);color:#f0a29c;border-color:#5c2a26;}
+.shell{flex:1;display:flex;min-height:0;}
+.sidebar{width:236px;flex:none;background:var(--sidebar);border-right:1px solid var(--border);overflow-y:auto;padding:10px 0;}
+.side-group-label{font-size:9.5px;letter-spacing:1.5px;color:var(--text-faint);text-transform:uppercase;padding:14px 18px 6px;font-weight:700;}
+.side-item{display:flex;align-items:center;gap:10px;padding:9px 18px;font-size:12.5px;color:var(--text-dim);cursor:pointer;border-left:2px solid transparent;position:relative;transition:background .12s,color .12s;}
+.side-item:hover{background:var(--sidebar-hov);color:var(--text);}
+.side-item.active{background:var(--sidebar-hov);color:var(--gold);border-left-color:var(--gold);}
+.side-item .ic{width:16px;text-align:center;font-size:13px;flex:none;}
+.side-item .badge{margin-left:auto;background:var(--red);color:#fff;font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:8px;}
+.side-item.admin-item{color:var(--purple);}
+.side-item.admin-item.active{color:var(--purple);border-left-color:var(--purple);}
+.main{flex:1;overflow-y:auto;padding:22px 26px;min-width:0;}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:20px;overflow:hidden;}
+.panel-head{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;background:var(--panel-head);border-bottom:2px solid var(--gold-dim);}
+.panel-head h2{font-family:var(--font-mono);font-size:13px;letter-spacing:1.5px;font-weight:700;color:var(--text);}
+.panel-head .meta{font-size:11px;color:var(--text-faint);margin-top:2px;font-family:var(--font-mono);}
+.btn-add{background:var(--gold);color:#1a1204;font-weight:700;font-size:11.5px;letter-spacing:.5px;padding:8px 14px;border-radius:var(--radius);display:flex;align-items:center;gap:6px;transition:filter .15s;}
+.btn-add:hover{filter:brightness(1.1);}
+.toolbar{display:flex;gap:10px;padding:14px 18px;border-bottom:1px solid var(--border-soft);flex-wrap:wrap;}
+.search-input{flex:1;min-width:200px;background:var(--panel-alt);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:var(--radius);font-size:12.5px;}
+.search-input::placeholder{color:var(--text-faint);}
+.filter-select{background:var(--panel-alt);border:1px solid var(--border);color:var(--text-dim);padding:9px 10px;border-radius:var(--radius);font-size:12px;}
+table{width:100%;border-collapse:collapse;}
+thead th{text-align:left;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text-faint);font-weight:700;padding:10px 16px;background:var(--panel-head);border-bottom:1px solid var(--border);white-space:nowrap;}
+tbody tr{border-bottom:1px solid var(--border-soft);transition:background .1s;}
+tbody tr:nth-child(odd){background:var(--panel-row-alt);}
+tbody tr:hover{background:var(--sidebar-hov);}
+tbody td{padding:11px 16px;font-size:12.5px;color:var(--text);vertical-align:middle;}
+td.dim{color:var(--text-dim);font-size:12px;}
+td.mono{font-family:var(--font-mono);font-size:11.5px;color:var(--text-dim);}
+.empty-row td{text-align:center;padding:34px;color:var(--text-faint);font-size:12.5px;font-style:italic;}
+.badge{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.4px;padding:3px 9px;border-radius:10px;}
+.badge-green{background:var(--green-bg);color:#7fd9a2;border:1px solid #235a3d;}
+.badge-red{background:var(--red-bg);color:#f0a29c;border:1px solid #5c2a26;}
+.badge-amber{background:var(--amber-bg);color:#e8c07f;border:1px solid #6b4e22;}
+.badge-blue{background:#132b42;color:#8fc3ee;border:1px solid #1f4864;}
+.badge-purple{background:var(--purple-bg);color:#c9b8ee;border:1px solid #4a3a70;}
+.badge-gray{background:#242f3d;color:var(--text-dim);border:1px solid var(--border);}
+.row-actions{display:flex;gap:6px;justify-content:flex-end;}
+.icon-btn{width:28px;height:28px;border-radius:var(--radius);background:var(--panel-alt);border:1px solid var(--border);color:var(--text-dim);display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .12s;}
+.icon-btn:hover{color:var(--text);border-color:var(--text-faint);}
+.icon-btn.danger:hover{color:#f0a29c;border-color:#5c2a26;background:var(--red-bg);}
+.icon-btn.ok:hover{color:#7fd9a2;border-color:#235a3d;background:var(--green-bg);}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;padding:16px 18px;}
+.card{background:var(--panel-alt);border:1px solid var(--border);border-radius:var(--radius);padding:16px;transition:border-color .15s,transform .1s;position:relative;}
+.card:hover{border-color:var(--gold-dim);transform:translateY(-1px);}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.card-title{font-weight:700;font-size:13.5px;}
+.card-sub{font-family:var(--font-mono);font-size:10.5px;color:var(--text-faint);margin-top:2px;}
+.card-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex:none;}
+.card-body{font-size:11.5px;color:var(--text-dim);line-height:1.9;}
+.card-body b{color:var(--text);font-weight:600;}
+.card-icon{width:44px;height:44px;border-radius:var(--radius);background:var(--sidebar);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:10px;}
+.card-actions{margin-top:12px;display:flex;gap:6px;justify-content:flex-end;}
+.detail-grid{display:grid;grid-template-columns:2fr 1fr;gap:0;}
+.detail-main{padding:18px;border-right:1px solid var(--border-soft);}
+.detail-side{padding:18px;}
+.detail-label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text-faint);font-weight:700;margin-bottom:5px;}
+.detail-value{font-size:13px;color:var(--text);margin-bottom:16px;line-height:1.6;}
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim);cursor:pointer;padding:6px 0;}
+.back-link:hover{color:var(--gold);}
+.modal-overlay{position:fixed;inset:0;background:rgba(4,7,12,.72);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:600;padding:20px;}
+.modal-overlay.active{display:flex;}
+.modal{width:100%;max-width:620px;max-height:88vh;overflow-y:auto;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 30px 80px -20px rgba(0,0,0,.8);}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;background:var(--panel-head);border-bottom:2px solid var(--gold-dim);position:sticky;top:0;z-index:2;}
+.modal-head h3{font-family:var(--font-mono);font-size:13px;letter-spacing:1px;}
+.modal-close{width:26px;height:26px;border-radius:var(--radius);background:var(--panel-alt);border:1px solid var(--border);color:var(--text-dim);font-size:14px;}
+.modal-close:hover{color:#f0a29c;}
+.modal-body{padding:20px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.form-row.single{grid-template-columns:1fr;}
+.field textarea{resize:vertical;min-height:70px;}
+.modal-foot{padding:16px 20px;border-top:1px solid var(--border-soft);display:flex;gap:10px;justify-content:flex-end;position:sticky;bottom:0;background:var(--panel);}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text-dim);padding:10px 16px;border-radius:var(--radius);font-size:12px;letter-spacing:.4px;}
+.btn-ghost:hover{border-color:var(--text-faint);color:var(--text);}
+.btn-danger-fill{background:var(--red);color:#fff;padding:10px 16px;border-radius:var(--radius);font-size:12px;font-weight:700;letter-spacing:.4px;}
+.btn-danger-fill:hover{filter:brightness(1.1);}
+#toast-wrap{position:fixed;bottom:22px;right:22px;z-index:900;display:flex;flex-direction:column;gap:8px;}
+.toast{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--gold);padding:12px 16px;border-radius:var(--radius);font-size:12.5px;box-shadow:0 10px 30px rgba(0,0,0,.4);min-width:240px;animation:toastin .18s ease-out;}
+.toast.err{border-left-color:var(--red);}
+.toast.ok{border-left-color:var(--green);}
+@keyframes toastin{from{transform:translateY(8px);opacity:0}to{transform:translateY(0);opacity:1}}
+.empty-state{padding:50px 20px;text-align:center;color:var(--text-faint);}
+.empty-state .big{font-size:34px;margin-bottom:10px;opacity:.6;}
+.empty-state .t1{font-size:13px;color:var(--text-dim);margin-bottom:4px;}
+.empty-state .t2{font-size:11.5px;}
+.split-two{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+@media (max-width:980px){.split-two{grid-template-columns:1fr}}
+.tab-row{display:flex;gap:2px;padding:0 18px;background:var(--panel-head);border-bottom:1px solid var(--border-soft);}
+.tab-btn{padding:11px 16px;font-size:11.5px;color:var(--text-dim);letter-spacing:.5px;border-bottom:2px solid transparent;font-weight:600;}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
+.doc-item{display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid var(--border-soft);font-size:12px;}
+.doc-item .di-name{flex:1;color:var(--text);font-weight:500;}
+.doc-item .di-meta{color:var(--text-faint);font-size:11px;font-family:var(--font-mono);}
+.stat-strip{display:flex;gap:14px;padding:16px 18px;flex-wrap:wrap;}
+.stat-box{flex:1;min-width:130px;background:var(--panel-alt);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;}
+.stat-box .num{font-family:var(--font-mono);font-size:22px;font-weight:700;color:var(--gold);}
+.stat-box .lbl{font-size:10.5px;color:var(--text-dim);letter-spacing:.5px;margin-top:4px;text-transform:uppercase;}
+.perm-matrix{width:100%;border-collapse:collapse;margin-top:6px;}
+.perm-matrix th{text-align:left;font-size:10px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.5px;padding:6px 8px;border-bottom:1px solid var(--border);}
+.perm-matrix td{padding:6px 8px;font-size:12px;border-bottom:1px solid var(--border-soft);}
+.perm-matrix select{background:var(--panel-alt);border:1px solid var(--border);color:var(--text);padding:5px 8px;border-radius:var(--radius);font-size:11.5px;width:100%;}
+.perm-pill{display:inline-block;font-size:9.5px;padding:2px 7px;border-radius:8px;margin:1px;font-weight:600;}
+.pp-write{background:var(--green-bg);color:#7fd9a2;}
+.pp-read{background:#132b42;color:#8fc3ee;}
+.chk-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--border-soft);font-size:12.5px;}
+.chk-row input{width:16px;height:16px;}
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-topline"></div>
+    <div class="login-body">
+      <div class="login-seal">DOJ</div>
+      <div class="login-title">DEPARTMENT OF JUSTICE</div>
+      <div class="login-sub">System Administracji Stanowej &middot; San Andreas</div>
+      <div class="login-error" id="login-error">Nieprawidłowy login lub hasło.</div>
+      <form id="login-form">
+        <div class="field">
+          <label>Identyfikator urzędnika</label>
+          <input type="text" id="login-user" autocomplete="username" placeholder="Login" required>
+        </div>
+        <div class="field">
+          <label>Hasło dostępu</label>
+          <input type="password" id="login-pass" autocomplete="current-password" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn-primary">Zaloguj się do systemu</button>
+      </form>
+
+    </div>
+    <div class="login-foot">DOJ.SA.GOV &middot; BUILD 3.0.0 &middot; POŁĄCZENIE SZYFROWANE</div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-seal">DOJ</div>
+    <div class="topbar-title">DEPARTMENT OF <span>JUSTICE</span></div>
+    <div class="topbar-clock" id="clock">--/--/---- --:--:--</div>
+    <div class="topbar-spacer"></div>
+    <div class="topbar-user">
+      <div class="topbar-user-info">
+        <div class="topbar-user-name" id="cur-user-name">—</div>
+        <div class="topbar-user-role" id="cur-user-role">—</div>
+      </div>
+      <div class="topbar-avatar" id="cur-user-avatar">—</div>
+      <button class="btn-logout" id="btn-logout">Wyloguj się</button>
+    </div>
+  </div>
+  <div class="shell">
+    <div class="sidebar" id="sidebar"></div>
+    <div class="main" id="main"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal-el">
+    <div class="modal-head"><h3 id="modal-title">FORMULARZ</h3><button class="modal-close" id="modal-close">✕</button></div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-foot" id="modal-foot"></div>
+  </div>
+</div>
+
+<div id="toast-wrap"></div>
+
+<script>
+/* =========================================================
+   DEPARTMENT OF JUSTICE — System Administracji Stanowej
+   Attorney General's Office = administrator systemu
+   ========================================================= */
+
+const DB_KEY = 'doj_db_v3';
+const SESSION_KEY = 'doj_session_v3';
+
+/* Departamenty, do których kierowane są wnioski w module Poczty
+   i wg których przypisywane są konta urzędników. */
+const DEPARTMENTS = [
+  {key:'AGO', name:"Attorney General's Office"},
+  {key:'DA',  name:"District Attorney's Office"},
+  {key:'SC',  name:'Superior Court'},
+  {key:'FTB', name:'Franchise Tax Board'},
+  {key:'BAR', name:'State Bar'},
+];
+function deptName(key){ const d = DEPARTMENTS.find(x=>x.key===key); return d ? d.name : key; }
+
+/* Moduły systemu podlegające nadawaniu uprawnień (odczyt / zapis). */
+const MODULES = [
+  {key:'cases', label:'Akta spraw'},
+  {key:'businesses', label:'Przedsiębiorstwa'},
+  {key:'businessRegistry', label:'Rejestr przedsiębiorstw'},
+  {key:'licenses', label:'Rejestr koncesji'},
+  {key:'taxes', label:'Rejestr podatków'},
+  {key:'veterans', label:'Rejestr weteranów'},
+  {key:'taxis', label:'Rejestr licencji taxi'},
+  {key:'attorneys', label:'Rejestr adwokatów'},
+  {key:'debtors', label:'Dłużnicy'},
+  {key:'hearings', label:'Rozprawy sądowe'},
+  {key:'gangs', label:'SA Gang Database'},
+];
+
+function esc(s){ return String(s??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function uid(prefix){ return prefix + Math.random().toString(36).slice(2,7).toUpperCase(); }
+function todayStr(){ const d=new Date(); const p=n=>String(n).padStart(2,'0'); return `${p(d.getMonth()+1)}/${p(d.getDate())}/${d.getFullYear()}`; }
+function nowStamp(){ const d=new Date(); const p=n=>String(n).padStart(2,'0'); return `${p(d.getMonth()+1)}/${p(d.getDate())}/${d.getFullYear()} | ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`; }
+
+/* -------------------- SEED (system startowy — bez danych testowych) -------------------- */
+function emptyPermissions(){
+  const p = {}; MODULES.forEach(m=> p[m.key]='none'); return p;
+}
+function seedDB(){
+  return {
+    users: [
+      {
+        login:'1admin123', pass:'1admin123',
+        name:'Prokurator Generalny', title:"Attorney General Stanu San Andreas",
+        department:'AGO', isAdmin:true, permissions: (()=>{ const p=emptyPermissions(); MODULES.forEach(m=>p[m.key]='write'); return p; })(),
+        created: nowStamp()
+      }
+    ],
+    cases: [],
+    businesses: [],
+    licenses: [],
+    taxes: [],
+    veterans: [],
+    taxis: [],
+    attorneys: [],
+    debtors: [],
+    hearings: [],
+    gangMembers: [],
+    gangGroups: [],
+    postal: [],
+    meta:{ lastCaseSeq: 1000 }
+  };
+}
+
+let DB = null;
+function loadDB(){
+  const raw = localStorage.getItem(DB_KEY);
+  if(raw){ try{ DB = JSON.parse(raw); return; }catch(e){} }
+  DB = seedDB();
+  saveDB();
+}
+function saveDB(){ localStorage.setItem(DB_KEY, JSON.stringify(DB)); }
+
+/* -------------------- BEZPIECZEŃSTWO: HASHOWANIE HASEŁ -------------------- */
+/* Hasła nigdy nie są przechowywane jawnym tekstem — każde konto ma unikalną sól
+   oraz wielokrotnie iterowany hash SHA-256 (utrudnia ataki słownikowe/bruteforce
+   nawet przy dostępie do surowych danych localStorage). */
+async function sha256Hex(str){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function randomSalt(){ return Array.from(crypto.getRandomValues(new Uint8Array(16))).map(b=>b.toString(16).padStart(2,'0')).join(''); }
+async function hashPassword(pass, salt){
+  let h = salt + ':' + pass;
+  for(let i=0;i<3000;i++){ h = await sha256Hex(h); }
+  return h;
+}
+async function setUserPassword(user, plainPass){
+  const salt = randomSalt();
+  user.salt = salt;
+  user.passHash = await hashPassword(plainPass, salt);
+  delete user.pass;
+}
+async function verifyUserPassword(user, plainPass){
+  if(user.passHash && user.salt) return (await hashPassword(plainPass, user.salt)) === user.passHash;
+  return !!user.pass && user.pass === plainPass; // zgodność wsteczna, migrowana automatycznie przy starcie
+}
+async function migrateLegacyPasswords(){
+  let changed = false;
+  for(const u of DB.users){ if(!u.passHash && u.pass){ await setUserPassword(u, u.pass); changed = true; } }
+  if(changed) saveDB();
+}
+
+/* -------------------- BEZPIECZEŃSTWO: BLOKADA PRÓB LOGOWANIA -------------------- */
+const GUARD_KEY = 'doj_login_guard_v1';
+const LOCK_MS = 60000, MAX_FAILS = 5;
+function loadGuard(){ try{ return JSON.parse(localStorage.getItem(GUARD_KEY))||{}; }catch(e){ return {}; } }
+function saveGuard(g){ localStorage.setItem(GUARD_KEY, JSON.stringify(g)); }
+
+/* -------------------- SESSION / AUTH -------------------- */
+const SESSION_DURATION_MS = 8*60*60*1000;   // sesja wygasa po 8h niezależnie od aktywności
+const IDLE_LIMIT_MS = 20*60*1000;           // automatyczne wylogowanie po 20 min bezczynności
+let CURRENT_USER = null;
+
+async function tryLogin(login, pass){
+  const key = login.trim().toLowerCase();
+  const guard = loadGuard();
+  const g = guard[key] || {fails:0, lockUntil:0};
+  if(g.lockUntil && Date.now() < g.lockUntil){
+    return {ok:false, locked:true, secs:Math.ceil((g.lockUntil - Date.now())/1000)};
+  }
+  const acc = DB.users.find(a=>a.login.toLowerCase()===key);
+  const ok = acc ? await verifyUserPassword(acc, pass) : false;
+  if(!ok){
+    g.fails = (g.fails||0) + 1;
+    if(g.fails >= MAX_FAILS){ g.lockUntil = Date.now() + LOCK_MS; g.fails = 0; }
+    guard[key] = g; saveGuard(guard);
+    return {ok:false};
+  }
+  guard[key] = {fails:0, lockUntil:0}; saveGuard(guard);
+  CURRENT_USER = acc;
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify({login:key, exp: Date.now() + SESSION_DURATION_MS}));
+  return {ok:true};
+}
+function restoreSession(){
+  const raw = sessionStorage.getItem(SESSION_KEY);
+  if(!raw) return false;
+  let data; try{ data = JSON.parse(raw); }catch(e){ return false; }
+  if(!data || !data.login || Date.now() > data.exp){ sessionStorage.removeItem(SESSION_KEY); return false; }
+  const acc = DB.users.find(a=>a.login.toLowerCase()===data.login);
+  if(!acc) return false;
+  CURRENT_USER = acc;
+  return true;
+}
+function logout(){ sessionStorage.removeItem(SESSION_KEY); CURRENT_USER=null; location.reload(); }
+
+/* -------------------- PERMISSIONS -------------------- */
+function canRead(moduleKey){
+  if(CURRENT_USER.isAdmin) return true;
+  const p = CURRENT_USER.permissions ? CURRENT_USER.permissions[moduleKey] : 'none';
+  return p==='read' || p==='write';
+}
+function canWrite(moduleKey){
+  if(CURRENT_USER.isAdmin) return true;
+  const p = CURRENT_USER.permissions ? CURRENT_USER.permissions[moduleKey] : 'none';
+  return p==='write';
+}
+
+/* -------------------- TOAST -------------------- */
+function toast(msg, kind){
+  const wrap = document.getElementById('toast-wrap');
+  const el = document.createElement('div');
+  el.className = 'toast ' + (kind||'');
+  el.textContent = msg;
+  wrap.appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(()=>el.remove(),300); }, 2600);
+}
+
+/* -------------------- MODAL -------------------- */
+function closeModal(){ document.getElementById('modal-overlay').classList.remove('active'); }
+function openModal(title, bodyHtml, footHtml){
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = bodyHtml;
+  document.getElementById('modal-foot').innerHTML = footHtml;
+  document.getElementById('modal-overlay').classList.add('active');
+}
+document.getElementById('modal-close').onclick = closeModal;
+document.getElementById('modal-overlay').addEventListener('click', e=>{ if(e.target.id==='modal-overlay') closeModal(); });
+function confirmDelete(msg, onYes){
+  openModal('POTWIERDŹ USUNIĘCIE', `<p style="font-size:13px;color:var(--text-dim);line-height:1.7">${msg}</p>`,
+    `<button class="btn-ghost" onclick="closeModal()">Anuluj</button>
+     <button class="btn-danger-fill" id="confirm-del-btn">Usuń trwale</button>`);
+  document.getElementById('confirm-del-btn').onclick = ()=>{ onYes(); closeModal(); };
+}
+
+/* -------------------- NAV / ROUTER -------------------- */
+function buildNav(){
+  const groups = [];
+
+  // Akta spraw — wspólne dla AGO / DA / Superior Court, dostępność wg uprawnienia 'cases'
+  const g0items = [];
+  if(canRead('cases')) g0items.push({key:'cases', label:'Akta spraw', icon:'📁'});
+  if(g0items.length) groups.push({group:'Sprawy', items:g0items});
+
+  // OGÓLNE — wspólne rejestry stanowe, dostępne niezależnie od departamentu (wg uprawnień)
+  const gGEN = [];
+  if(canRead('businesses')) gGEN.push({key:'businesses', label:'Przedsiębiorstwa', icon:'🏢'});
+  if(canRead('businessRegistry')) gGEN.push({key:'businessRegistry', label:'Rejestr przedsiębiorstw', icon:'📋'});
+  if(canRead('licenses')) gGEN.push({key:'licenses', label:'Rejestr koncesji', icon:'📜'});
+  if(canRead('veterans')) gGEN.push({key:'veterans', label:'Rejestr weteranów', icon:'🎖️'});
+  if(canRead('taxis')) gGEN.push({key:'taxis', label:'Rejestr licencji taxi', icon:'🚕'});
+  if(canRead('attorneys')) gGEN.push({key:'attorneys', label:'Rejestr adwokatów', icon:'⚖️'});
+  if(canRead('gangs')) gGEN.push({key:'gangs', label:'SA Gang Database', icon:'🕶️'});
+  if(gGEN.length) groups.push({group:'OGÓLNE', items:gGEN});
+
+  // SUPERIOR COURT — kalendarz rozpraw
+  const gSC = [];
+  if(canRead('hearings')) gSC.push({key:'hearings', label:'Rozprawy sądowe', icon:'🏛️'});
+  if(gSC.length) groups.push({group:'SUPERIOR COURT', items:gSC});
+
+  // FRANCHISE TAX BOARD — podatki i windykacja
+  const gFTB = [];
+  if(canRead('taxes')) gFTB.push({key:'taxes', label:'Rejestr podatków', icon:'💰'});
+  if(canRead('debtors')) gFTB.push({key:'debtors', label:'Dłużnicy', icon:'💸'});
+  if(gFTB.length) groups.push({group:'FRANCHISE TAX BOARD', items:gFTB});
+
+  groups.push({group:'Korespondencja', items:[{key:'postal', label:'Poczta / Wnioski', icon:'✉️'}]});
+
+  if(CURRENT_USER.isAdmin){
+    groups.push({group:'Administracja', items:[{key:'settings', label:'Ustawienia', icon:'🛡️', admin:true}]});
+  }
+  return groups;
+}
+
+let currentRoute = 'postal';
+let currentCaseId = null;
+let postalTab = 'inbox';
+
+function renderSidebar(){
+  const sb = document.getElementById('sidebar');
+  const myDept = CURRENT_USER.department;
+  const pendingPostal = DB.postal.filter(p=> p.status==='Oczekujący' && (CURRENT_USER.isAdmin || p.toDept===myDept)).length;
+  const nav = buildNav();
+  sb.innerHTML = nav.map(g=>`
+    <div class="side-group-label">${g.group}</div>
+    ${g.items.map(it=>`
+      <div class="side-item ${it.admin?'admin-item':''} ${currentRoute===it.key?'active':''}" data-route="${it.key}">
+        <span class="ic">${it.icon}</span><span>${it.label}</span>
+        ${it.key==='postal' && pendingPostal>0 ? `<span class="badge">${pendingPostal}</span>`:''}
+      </div>`).join('')}
+  `).join('');
+  sb.querySelectorAll('.side-item').forEach(el=>{ el.onclick = ()=>navigate(el.dataset.route); });
+}
+
+function firstAvailableRoute(){
+  const nav = buildNav();
+  for(const g of nav){ if(g.items.length) return g.items[0].key; }
+  return 'postal';
+}
+
+function navigate(route, param){
+  const guarded = ['cases','businesses','businessRegistry','licenses','taxes','veterans','taxis','attorneys','debtors','hearings','gangs'];
+  if(route==='caseDetail'){
+    if(!canRead('cases')){ toast('Brak dostępu do tego modułu.','err'); route='postal'; }
+  } else if(guarded.includes(route) && !canRead(route)){
+    toast('Brak dostępu do tego modułu.','err'); route = firstAvailableRoute();
+  } else if(route==='settings' && !CURRENT_USER.isAdmin){
+    toast('Brak uprawnień administracyjnych.','err'); route='postal';
+  }
+  currentRoute = route;
+  currentCaseId = param || null;
+  renderSidebar();
+  renderMain();
+}
+
+function renderMain(){
+  const main = document.getElementById('main');
+  main.innerHTML = '';
+  const renderers = {
+    cases: renderCases, caseDetail: renderCaseDetail,
+    businesses: renderBusinesses, businessRegistry: renderBusinessRegistry,
+    licenses: renderLicenses, taxes: renderTaxes, veterans: renderVeterans,
+    taxis: renderTaxis, attorneys: renderAttorneys, debtors: renderDebtors,
+    hearings: renderHearings, gangs: renderGangs,
+    postal: renderPostal, settings: renderSettings,
+  };
+  (renderers[currentRoute] || renderPostal)(main);
+}
+
+function panelShell(title, meta, addLabel, onAdd){
+  const wrap = document.createElement('div');
+  wrap.className = 'panel';
+  wrap.innerHTML = `
+    <div class="panel-head">
+      <div><h2>${title}</h2>${meta?`<div class="meta">${meta}</div>`:''}</div>
+      ${addLabel?`<button class="btn-add" id="panel-add-btn">+ ${addLabel}</button>`:''}
+    </div>`;
+  if(addLabel){ wrap.querySelector('#panel-add-btn').onclick = onAdd; }
+  return wrap;
+}
+function badgeFor(status){
+  const s = (status||'').toLowerCase();
+  if(['aktywna','aktywny','aktywne','otwarta','zatwierdzony','przyjęty'].includes(s)) return `<span class="badge badge-green">${status}</span>`;
+  if(['nieaktywna','zakończona','odrzucony','zawieszona','odesłany'].includes(s)) return `<span class="badge badge-red">${status}</span>`;
+  if(['oczekujący','wersja robocza'].includes(s)) return `<span class="badge badge-amber">${status}</span>`;
+  return `<span class="badge badge-gray">${status}</span>`;
+}
+function searchFilter(list, query, fields){
+  if(!query) return list;
+  const q = query.toLowerCase();
+  return list.filter(item=> fields.some(f=> String(item[f]||'').toLowerCase().includes(q)));
+}
+function noAccessPanel(main, title){
+  main.innerHTML = `<div class="panel"><div class="empty-state"><div class="big">🔒</div><div class="t1">Brak dostępu do modułu: ${title}</div><div class="t2">Skontaktuj się z administratorem systemu, aby uzyskać uprawnienia.</div></div></div>`;
+}
+
+/* ================= CASES ================= */
+function renderCases(main){
+  if(!canRead('cases')) return noAccessPanel(main,'Akta spraw');
+  const panel = panelShell('AKTA SPRAW', `Łącznie: ${DB.cases.length} spraw`, canWrite('cases')?'Dodaj':null, openAddCaseModal);
+  const toolbar = document.createElement('div'); toolbar.className='toolbar';
+  toolbar.innerHTML = `
+    <input class="search-input" id="case-search" placeholder="Wyszukaj po sygnaturze lub tytule...">
+    <select class="filter-select" id="case-dept-filter">
+      <option value="">Wszystkie departamenty</option>
+      <option value="GO">GO — Kancelaria Ogólna</option>
+      <option value="IRS">IRS — Skarbowość</option>
+      <option value="SC">SC — Sąd Najwyższy</option>
+    </select>
+    <select class="filter-select" id="case-status-filter">
+      <option value="">Wszystkie statusy</option><option>Otwarta</option><option>Zakończona</option>
+    </select>`;
+  panel.appendChild(toolbar);
+  const tableWrap = document.createElement('div');
+  panel.appendChild(tableWrap);
+  main.appendChild(panel);
+
+  function draw(){
+    let list = [...DB.cases].reverse();
+    list = searchFilter(list, document.getElementById('case-search').value, ['id','title']);
+    const dept = document.getElementById('case-dept-filter').value;
+    if(dept) list = list.filter(c=>c.dept===dept);
+    const st = document.getElementById('case-status-filter').value;
+    if(st) list = list.filter(c=>c.status===st);
+    tableWrap.innerHTML = `<table>
+      <thead><tr><th>Sygnatura</th><th>Tytuł</th><th>Status</th><th>Prowadzący</th><th>Widoczność</th><th></th></tr></thead>
+      <tbody>
+      ${list.length? list.map(c=>`
+        <tr>
+          <td class="mono"><a href="#" data-open="${c.id}">${c.id}</a></td>
+          <td>${esc(c.title)}</td><td>${badgeFor(c.status)}</td><td class="dim">${esc(c.lead)}</td><td class="dim">${esc(c.visibility)}</td>
+          <td><div class="row-actions">
+            <button class="icon-btn" data-open="${c.id}" title="Otwórz">👁</button>
+            ${canWrite('cases')?`<button class="icon-btn danger" data-del="${c.id}" title="Usuń">🗑</button>`:''}
+          </div></td>
+        </tr>`).join('') : `<tr class="empty-row"><td colspan="6">Brak rekordów spełniających kryteria wyszukiwania.</td></tr>`}
+      </tbody></table>`;
+    tableWrap.querySelectorAll('[data-open]').forEach(el=> el.onclick=(e)=>{e.preventDefault(); navigate('caseDetail', el.dataset.open);});
+    tableWrap.querySelectorAll('[data-del]').forEach(el=> el.onclick=()=>{
+      confirmDelete(`Czy na pewno chcesz trwale usunąć akta sprawy <b>${el.dataset.del}</b>?`, ()=>{
+        DB.cases = DB.cases.filter(c=>c.id!==el.dataset.del); saveDB(); toast('Akta sprawy usunięte.','ok'); draw();
+      });
+    });
+  }
+  ['case-search','case-dept-filter','case-status-filter'].forEach(id=>{
+    document.getElementById(id).addEventListener('input', draw);
+    document.getElementById(id).addEventListener('change', draw);
+  });
+  draw();
+}
+function openAddCaseModal(opts){
+  const presetDept = (opts && opts.presetDept) || 'GO';
+  const presetTitle = (opts && opts.presetTitle) || '';
+  const linkBack = opts && typeof opts.onCreated === 'function' ? opts.onCreated : null;
+  openModal(presetDept==='SC' ? 'NOWE AKTA SPRAWY (SĄDOWE)' : 'NOWE AKTA SPRAWY', `
+    <div class="form-row">
+      <div class="field"><label>Departament</label><select id="f-dept">
+        <option value="GO" ${presetDept==='GO'?'selected':''}>GO — Kancelaria Ogólna</option>
+        <option value="IRS" ${presetDept==='IRS'?'selected':''}>IRS — Skarbowość</option>
+        <option value="SC" ${presetDept==='SC'?'selected':''}>SC — Sąd Najwyższy</option>
+      </select></div>
+      <div class="field"><label>Status</label><select id="f-status"><option>Otwarta</option><option>Zakończona</option></select></div>
+    </div>
+    <div class="field"><label>Tytuł sprawy</label><input id="f-title" placeholder="np. Wniosek o wydanie koncesji" value="${esc(presetTitle)}"></div>
+    <div class="field"><label>Opis sprawy</label><textarea id="f-desc"></textarea></div>
+    <div class="form-row">
+      <div class="field"><label>Poziom dostępu</label><select id="f-access"><option>Poziom 1</option><option>Poziom 2</option><option>Poziom 3</option></select></div>
+      <div class="field"><label>Widoczność</label><select id="f-vis"><option>Niepubliczna</option><option>Publiczna</option></select></div>
+    </div>
+    <div class="field"><label>Prowadzący</label><input id="f-lead" value="${esc(CURRENT_USER.name)}"></div>
+  `, `<button class="btn-ghost" onclick="closeModal()">Anuluj</button><button class="btn-add" id="save-case-btn">Utwórz akta sprawy</button>`);
+  document.getElementById('save-case-btn').onclick = ()=>{
+    const title = document.getElementById('f-title').value.trim();
+    if(!title){ toast('Podaj tytuł sprawy.','err'); return; }
+    const dept = document.getElementById('f-dept').value;
+    DB.meta.lastCaseSeq += 1;
+    const id = `${dept}/2026/${String(DB.meta.lastCaseSeq).padStart(5,'0')}`;
+    DB.cases.push({ id, dept, title, desc:document.getElementById('f-desc').value.trim(), status:document.getElementById('f-status').value,
+      accessLevel:document.getElementById('f-access').value, visibility:document.getElementById('f-vis').value,
+      lead:document.getElementById('f-lead').value.trim()||CURRENT_USER.name, created:nowStamp(), docs:[] });
+    saveDB();
+    if(linkBack){ closeModal(); linkBack(id); }
+    else{ closeModal(); toast(`Utworzono akta sprawy ${id}.`,'ok'); navigate('cases'); }
+  };
+}
+
+/* ================= POWIĄZANE AKTA SPRAW (dołączane do rejestrów) ================= */
+function caseLinkCell(record){
+  const ids = record.linkedCases || [];
+  const badges = ids.map(id=>`<span class="badge badge-blue" style="cursor:pointer" data-caseid="${esc(id)}" title="Otwórz akta sprawy">${esc(id)}</span>`).join(' ');
+  return `<div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">${badges}<button class="icon-btn" data-linkcase title="Powiąż akta sprawy">🔗</button></div>`;
+}
+function wireCaseLinkCell(container, record, defaultDept){
+  container.querySelectorAll('[data-caseid]').forEach(el=> el.onclick=()=>{ if(canRead('cases')) navigate('caseDetail', el.dataset.caseid); else toast('Brak dostępu do modułu Akta spraw.','err'); });
+  const linkBtn = container.querySelector('[data-linkcase]');
+  if(linkBtn) linkBtn.onclick = ()=> openLinkCasesModal(record, defaultDept||'GO');
+}
+function openLinkCasesModal(record, defaultDept){
+  if(!canRead('cases')){ toast('Brak dostępu do modułu Akta spraw.','err'); return; }
+  if(!record.linkedCases) record.linkedCases = [];
+  const renderList = ()=>{
+    const q = (document.getElementById('lc-search')?.value||'').toLowerCase();
+    const list = DB.cases.filter(c=> !q || c.id.toLowerCase().includes(q) || c.title.toLowerCase().includes(q));
+    return list.length ? list.map(c=>`
+      <label class="chk-row" style="cursor:pointer"><input type="checkbox" data-cid="${esc(c.id)}" ${record.linkedCases.includes(c.id)?'checked':''}>
+      <span class="mono" style="min-width:130px">${esc(c.id)}</span><span>${esc(c.title)}</span></label>`).join('')
+      : `<div class="dim" style="padding:10px 0;font-size:12px">Brak akt spraw spełniających kryteria wyszukiwania.</div>`;
+  };
+  openModal('POWIĄŻ AKTA SPRAWY', `
+    <div class="field"><label>Wyszukaj istniejące akta</label><input id="lc-search" placeholder="Sygnatura lub tytuł..."></div>
+    <div id="lc-list" style="max-height:260px;overflow-y:auto;margin-bottom:14px">${renderList()}</div>
+    <div style="border-top:1px solid var(--border-soft);padding-top:14px">
+      <div class="field" style="margin-bottom:0"><label>...lub utwórz nowe akta i powiąż automatycznie</label>
+      <button class="btn-ghost" id="lc-new-case" type="button">+ Utwórz nowe akta sprawy${defaultDept==='SC'?' (sądowe — SC)':''}</button></div>
+    </div>
+  `, `<button class="btn-ghost" onclick="closeModal()">Anuluj</button><button class="btn-add" id="lc-save-btn">Zapisz powiązania</button>`);
+  document.getElementById('lc-search').addEventListener('input', ()=>{ document.getElementById('lc-list').innerHTML = renderList(); });
+  document.getElementById('lc-new-case').onclick = ()=>{
+    openAddCaseModal({ presetDept: defaultDept||'GO', onCreated: (id)=>{
+      record.linkedCases.push(id); saveDB(); toast('Utworzono i powiązano nowe akta sprawy.','ok'); navigate(currentRoute);
+    }});
+  };
+  document.getElementById('lc-save-btn').onclick = ()=>{
+    const checked = Array.from(document.querySelectorAll('#lc-list [data-cid]:checked')).map(el=>el.dataset.cid);
+    record.linkedCases = checked;
+    saveDB(); closeModal(); toast('Powiązania z aktami spraw zaktualizowane.','ok'); navigate(currentRoute);
+  };
+}
+function renderCaseDetail(main){
+  if(!canRead('cases')) return noAccessPanel(main,'Akta spraw');
+  const c = DB.cases.find(x=>x.id===currentCaseId);
+  if(!c){ main.innerHTML = `<div class="empty-state"><div class="big">⚠</div><div class="t1">Nie znaleziono akt sprawy.</div></div>`; return; }
+  const back = document.createElement('div'); back.className='back-link'; back.innerHTML='← Powrót do listy akt spraw'; back.onclick=()=>navigate('cases');
+  main.appendChild(back);
+  const panel = document.createElement('div'); panel.className='panel';
+  panel.innerHTML = `
+    <div class="panel-head">
+      <div><h2>${esc(c.id)} — ${esc(c.title.toUpperCase())}</h2></div>
+      ${canWrite('cases')?`<button class="btn-ghost" id="edit-case-btn">⚙ Edytuj</button>`:''}
+    </div>
+    <div class="detail-grid">
+      <div class="detail-main"><div class="detail-label">Opis sprawy</div><div class="detail-value">${c.desc?esc(c.desc):'<i style="color:var(--text-faint)">Brak opisu.</i>'}</div></div>
+      <div class="detail-side">
+        <div class="detail-label">Status</div><div class="detail-value">${badgeFor(c.status)}</div>
+        <div class="detail-label">Poziom dostępu</div><div class="detail-value">${c.accessLevel}</div>
+        <div class="detail-label">Widoczność</div><div class="detail-value">${c.visibility}</div>
+        <div class="detail-label">Prowadzący</div><div class="detail-value">${esc(c.lead)}</div>
+        <div class="detail-label">Data utworzenia</div><div class="detail-value">${c.created}</div>
+      </div>
+    </div>`;
+  if(canWrite('cases')) panel.querySelector('#edit-case-btn').onclick = ()=>openEditCaseModal(c.id);
+  main.appendChild(panel);
+
+  const docsPanel = panelShell(`${c.id} — DOKUMENTY`, `${c.docs.length} dokument(y)`, canWrite('cases')?'Dodaj':null, ()=>window.__openAddDoc && window.__openAddDoc());
+  const docsBody = document.createElement('div'); docsPanel.appendChild(docsBody); main.appendChild(docsPanel);
+
+  function drawDocs(){
+    docsBody.innerHTML = c.docs.length ? `<table><thead><tr><th>Nazwa dokumentu</th><th>Rodzaj</th><th>Status</th><th>Ostatnia modyfikacja</th><th>Utworzony przez</th><th></th></tr></thead>
+      <tbody>${c.docs.map((d,i)=>`<tr><td>${esc(d.name)}</td><td class="dim">${esc(d.type)}</td><td>${badgeFor(d.status)}</td><td class="mono">${esc(d.modified)}</td><td class="dim">${esc(d.by)}</td>
+        <td><div class="row-actions">${canWrite('cases')?`<button class="icon-btn danger" data-di="${i}">🗑</button>`:''}</div></td></tr>`).join('')}</tbody></table>`
+      : `<div class="empty-state"><div class="big">🗂</div><div class="t1">Brak dokumentów</div><div class="t2">Ta sprawa nie posiada jeszcze żadnych załączonych dokumentów.</div></div>`;
+    docsBody.querySelectorAll('[data-di]').forEach(el=> el.onclick=()=>{
+      confirmDelete('Czy na pewno chcesz usunąć ten dokument z akt sprawy?', ()=>{ c.docs.splice(Number(el.dataset.di),1); saveDB(); toast('Dokument usunięty.','ok'); drawDocs(); });
+    });
+  }
+  drawDocs();
+  window.__openAddDoc = ()=>{
+    openModal('DODAJ DOKUMENT', `
+      <div class="field"><label>Nazwa dokumentu</label><input id="d-name" placeholder="np. Wniosek o..."></div>
+      <div class="form-row">
+        <div class="field"><label>Rodzaj dokumentu</label><select id="d-type"><option>Dokument urzędowy</option><option>Dowód — dokument</option><option>Dowód — nagranie</option><option>Transkrypcja</option></select></div>
+        <div class="field"><label>Status</label><select id="d-status"><option>Wersja robocza</option><option>Oczekujący</option><option>Zatwierdzony</option></select></div>
+      </div>`, `<button class="btn-ghost" onclick="closeModal()">Anuluj</button><button class="btn-add" id="save-doc-btn">Dodaj dokument</button>`);
+    document.getElementById('save-doc-btn').onclick = ()=>{
+      const name = document.getElementById('d-name').value.trim();
+      if(!name){ toast('Podaj nazwę dokumentu.','err'); return; }
+      c.docs.push({name, type:document.getElementById('d-type').value, status:document.getElementById('d-status').value, modified:nowStamp(), by:CURRENT_USER.name});
+      saveDB(); closeModal(); toast('Dokument dodany do akt sprawy.','ok'); drawDocs();
+    };
+  };
+}
+function openEditCaseModal(caseId){
+  const c = DB.cases.find(x=>x.id===caseId);
+  openModal(`EDYTUJ ${c.id}`, `
+    <div class="field"><label>Tytuł sprawy</label><input id="f-title" value="${esc(c.title)}"></div>
+    <div class="field"><label>Opis sprawy</label><textarea id="f-desc">${esc(c.desc||'')}</textarea></div>
+    <div class="form-row">
+      <div class="field"><label>Status</label><select id="f-status"><option ${c.status==='Otwarta'?'selected':''}>Otwarta</option><option ${c.status==='Zakończona'?'selected':''}>Zakończona</option></select></div>
+      <div class="field"><label>Widoczność</label><select id="f-vis"><option ${c.visibility==='Niepubliczna'?'selected':''}>Niepubliczna</option><option ${c.visibility==='Publiczna'?'selected':''}>Publiczna</option></select></div>
+    </div>
+    <div class="field"><label>Prowadzący</label><input id="f-lead" value="${esc(c.lead)}"></div>
+  `, `<button class="btn-ghost" onclick="closeModal()">Anuluj</button><button class="btn-add" id="upd-case-btn">Zapisz zmiany</button>`);
+  document.getElementById('upd-case-btn').onclick = ()=>{
+    c.title = document.getElementById('f-title').value.trim()||c.title;
+    c.desc = document.getElementById('f-desc').value.trim();
+    c.status = document.getElementById('f-status').value;
+    c.visibility = document.getElementById('f-vis').value;
+    c.lead = document.getElementById('f-lead').value.trim()||c.lead;
+    saveDB(); closeModal(); toast('Akta sprawy zaktualizowane.','ok'); navigate('caseDetail', c.id);
+  };
+}
+
+/* ================= BUSINESSES (grid) ================= */
+function renderBusinesses(main){
+  if(!canRead('businesses')) return noAccessPanel(main,'Przedsiębiorstwa');
+  const panel = panelShell('PRZEDSIĘBIORSTWA', `${DB.businesses.length} zarejestrowanych podmiotów`, canWrite('businesses')?'Dodaj':null, ()=>openAddBusinessModal(null));
+  const toolbar = document.createElement('div'); toolbar.className='toolbar'; toolbar.innerHTML=`<input class="search-input" id="biz-search" placeholder="Wyszukaj przedsiębiorstwo, EIN lub właściciela...">`;
+  panel.appendChild(toolbar);
+  const grid = document.createElement('div'); grid.className='grid'; panel.appendChild(grid); main.appendChild(panel);
+  function draw(){
+    let list = searchFilter(DB.businesses, document.getElementById('biz-search').value, ['name','ein','owners']);
+    grid.innerHTML = list.length ? list.map((b)=>{ const idx = DB.businesses.indexOf(b); return `
+      <div class="card">
+        <div class="card-icon">🏢</div>
+        <div class="card-top"><div><div class="card-title">${esc(b.name)}</div><div class="card-sub">EIN: ${esc(b.ein)}</div></div>
+        <div class="card-dot" style="background:${b.status==='Aktywne'?'var(--green)':'var(--red)'}"></div></div>
+        <div class="card-body"><b>Adres:</b> ${esc(b.address)}<br><b>Właściciele:</b> ${esc(b.owners)}<br><b>Data rejestracji:</b> ${esc(b.reg)}</div>
+        ${canRead('cases')?`<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border-soft)" data-caselink-idx="${idx}">${caseLinkCell(b)}</div>`:''}
+        <div class="card-actions">${canWrite('businesses')?`<button class="icon-btn" data-edit="${idx}">⚙</button><button class="icon-btn danger" data-del="${idx}">🗑</button>`:''}</div>
+      </div>`;}).join('') : `<div class="empty-state" style="grid-column:1/-1"><div class="big">🏢</div><div class="t1">Brak przedsiębiorstw</div><div class="t2">Rejestr jest pusty — dodaj pierwszy wpis.</div></div>`;
+    grid.querySelectorAll('[data-edit]').forEach(el=> el.onclick=()=>openAddBusinessModal(DB.businesses[Number(el.dataset.edit)]));
+    grid.querySelectorAll('[data-del]').forEach(el=> el.onclick=()=>{
+      const item = DB.businesses[Number(el.dataset.del)];
+      confirmDelete(`Czy na pewno chcesz usunąć przedsiębiorstwo <b>${esc(item.name)}</b> z rejestru?`, ()=>{ DB.businesses = DB.businesses.filter(x=>x!==item); saveDB(); toast('Przedsiębiorstwo usunięte.','ok'); draw(); });
+    });
+    if(canRead('cases')) grid.querySelectorAll('[data-caselink-idx]').forEach(cell=> wireCaseLinkCell(cell, DB.businesses[Number(cell.dataset.caselinkIdx)], 'GO'));
+  }
+  document.getElementById('biz-search').addEventListener('input', draw);
+  draw();
+}
+function openAddBusinessModal(existing){
+  const isEdit = !!existing;
+  openModal(isEdit?'EDYTUJ PRZEDSIĘBIORSTWO':'DODAJ PRZEDSIĘBIORSTWO', `
+    <div class="form-row">
+      <div class="field"><label>Nazwa przedsiębiorstwa</label><input id="f-name" value="${isEdit?existing.name:''}"></div>
+      <div class="field"><label>Numer EIN</label><input id="f-ein" value="${isEdit?existing.ein:('52-'+Math.floor(1000000+Math.random()*8999999))}"></div>
+    </div>
+    <div class="field"><label>Adres</label><input id="f-addr" value="${isEdit?existing.address:''}"></div>
+    <div class="field"><label>Właściciele</label><input id="f-owners" value="${isEdit?existing.owners:''}"></div>
+    <div class="field"><label>Status</label><select id="f-status"><option ${isEdit&&existing.status==='Aktywne'?'selected':''}>Aktywne</option><option ${isEdit&&existing.status==='Nieaktywne'?'selected':''}>Nieaktywne</option></select></div>
+  `, `<button class="btn-ghost" onclick="closeModal()">Anuluj</button><button class="btn-add" id="save-biz-btn">${isEdit?'Zapisz zmiany':'Zarejestruj przedsiębiorstwo'}</button>`);
+  document.getElementById('save-biz-btn').onclick = ()=>{
+    const name = document.getElementById('f-name').value.trim();
+    if(!name){ toast('Podaj nazwę przedsiębiorstwa.','err'); return; }
+    const data = { name, ein:document.getElementById('f-ein').value.trim(), address:document.getElementById('f-addr').value.trim(),
+      owners:document.getElementById('f-owners').value.trim(), status:document.getElementById('f-status').value, reg:isEdit?existing.reg:nowStamp() };
+    if(isEdit) Object.assign(existing, data); else DB.businesses.unshift(data);
+    saveDB(); closeModal(); toast(isEdit?'Dane zaktualizowane.':'Przedsiębiorstwo zarejestrowane.','ok'); navigate('businesses');
+  };
+}
+
+/* ================= GENERIC REGISTRY FACTORY ================= */
+function genericRegistry(main, opts){
+  if(!canRead(opts.moduleKey)) return noAccessPanel(main, opts.title);
+  const writable = canWrite(opts.moduleKey);
+  const panel = panelShell(opts.title, `${DB[opts.dataKey].length} rekordów`, writable?(opts.addLabel||'Dodaj nowy wpis'):null, ()=>openRecordModal(opts, null));
+  const toolbar = document.createElement('div'); toolbar.className='toolbar'; toolbar.innerHTML=`<input class="search-input" id="reg-search" placeholder="Wyszukaj...">`;
+  panel.appendChild(toolbar);
+  const tableWrap = document.createElement('div'); panel.appendChild(tableWrap); main.appendChild(panel);
+  const showCases = opts.caseDept !== false && canRead('cases');
+  function draw(){
+    let list = [...DB[opts.dataKey]];
+    if(opts.reverse) list.reverse();
+    list = searchFilter(list, document.getElementById('reg-search').value, opts.searchFields);
+    tableWrap.innerHTML = `<table><thead><tr>${opts.columns.map(c=>`<th>${esc(c.label)}</th>`).join('')}${showCases?'<th>Akta spraw</th>':''}<th></th></tr></thead>
+      <tbody>
+      ${list.length ? list.map((item)=>{
+        const idx = DB[opts.dataKey].indexOf(item);
+        return `<tr>${opts.columns.map(c=>{
+          let val = item[c.key];
+          if(c.type==='badge') return `<td>${badgeFor(val)}</td>`;
+          if(c.type==='mono') return `<td class="mono">${esc(val ?? '')}</td>`;
+          if(c.type==='dim') return `<td class="dim">${esc(val ?? '')}</td>`;
+          if(c.type==='money') return `<td class="mono">$${Number(val||0).toLocaleString('en-US')}</td>`;
+          return `<td>${esc(val ?? '')}</td>`;
+        }).join('')}
+        ${showCases?`<td data-caselink-idx="${idx}">${caseLinkCell(item)}</td>`:''}
+        <td><div class="row-actions">
+          ${writable?`<button class="icon-btn" data-edit="${idx}">⚙</button><button class="icon-btn danger" data-del="${idx}">🗑</button>`:''}
+        </div></td></tr>`;
+      }).join('') : `<tr class="empty-row"><td colspan="${opts.columns.length+(showCases?2:1)}">Brak rekordów do wyświetlenia.</td></tr>`}
+      </tbody></table>`;
+    tableWrap.querySelectorAll('[data-edit]').forEach(el=> el.onclick=()=>openRecordModal(opts, DB[opts.dataKey][Number(el.dataset.edit)]));
+    tableWrap.querySelectorAll('[data-del]').forEach(el=> el.onclick=()=>{
+      confirmDelete('Czy na pewno chcesz trwale usunąć ten wpis z rejestru?', ()=>{ DB[opts.dataKey].splice(Number(el.dataset.del),1); saveDB(); toast('Wpis usunięty z rejestru.','ok'); draw(); });
+    });
+    if(showCases){
+      tableWrap.querySelectorAll('[data-caselink-idx]').forEach(cell=>{
+        wireCaseLinkCell(cell, DB[opts.dataKey][Number(cell.dataset.caselinkIdx)], (typeof opts.caseDept==='string')?opts.caseDept:'GO');
+      });
+    }
+  }
+  document.getElementById('reg-search').addEventListener('input', draw);
+  draw();
+}
+function openRecordModal(opts, existing){
+  const isEdit = !!existing;
+  const bodyHtml = opts.formFields.map(f=>{
+    const val = isEdit ? (existing[f.key] ?? '') : (f.default ?? '');
+    if(f.type==='select') return `<div class="field"><label>${f.label}</label><select id="ff-${f.key}">${f.options.map(o=>`<option ${val===o?'selected':''}>${esc(o)}</option>`).join('')}</select></div>`;
+    if(f.type==='textarea') return `<div class="field"><label>${f.label}</label><textarea id="ff-${f.key}">${esc(val)}</textarea></div>`;
+    return `<div class="field"><label>${f.label}</label><input id="ff-${f.key}" value="${esc(val)}"></div>`;
+  });
+  let html = '';
+  for(let i=0;i<bodyHtml.length;i+=2){ html += bodyHtml[i+1] ? `<div class="form-row">${bodyHtml[i]}${bodyHtml[i+1]}</div>` : `<div class="form-row single">${bodyHtml[i]}</div>`; }
+  openModal(isEdit?'EDYTUJ WPIS':`DODAJ NOWY WPIS — ${opts.title}`, html,
+    `<button class="btn-ghost" onclick="closeModal()">Anuluj</button><button class="btn-add" id="save-rec-btn">${isEdit?'Zapisz zmiany':'Dodaj wpis'}</button>`);
+  document.getElementById('save-rec-btn').onclick = ()=>{
+    const data = {};
+    opts.formFields.forEach(f=>{ data[f.key] = document.getElementById('ff-'+f.key).value.trim(); });
+    if(opts.required && !data[opts.required]){ toast('Uzupełnij wymagane pole.','err'); return; }
+    if(opts.beforeSave) opts.beforeSave(data, isEdit, existing);
+    if(isEdit) Object.assign(existing, data); else DB[opts.dataKey].unshift(data);
+    saveDB(); closeModal(); toast(isEdit?'Wpis zaktualizowany.':'Nowy wpis dodany do rejestru.','ok'); navigate(currentRoute);
+  };
+}
+
+function renderBusinessRegistry(main){
+  genericRegistry(main, { title:'REJESTR PRZEDSIĘBIORSTW', dataKey:'businesses', moduleKey:'businessRegistry', reverse:true, caseDept:'GO',
+    searchFields:['name','ein','owners'],
+    columns:[{key:'name',label:'Nazwa przedsiębiorstwa'},{key:'ein',label:'Numer EIN',type:'mono'},{key:'address',label:'Adres',type:'dim'},{key:'owners',label:'Dane właścicieli',type:'dim'},{key:'reg',label:'Data rejestracji',type:'mono'},{key:'status',label:'Status',type:'badge'}],
+    formFields:[{key:'name',label:'Nazwa przedsiębiorstwa'},{key:'ein',label:'Numer EIN',default:'52-'+Math.floor(1000000+Math.random()*8999999)},{key:'address',label:'Adres'},{key:'owners',label:'Dane właścicieli'},{key:'status',label:'Status',type:'select',options:['Aktywne','Nieaktywne']}],
+    required:'name', beforeSave:(d,isEdit)=>{ if(!isEdit) d.reg = nowStamp(); } });
+}
+function renderLicenses(main){
+  genericRegistry(main, { title:'REJESTR KONCESJI', dataKey:'licenses', moduleKey:'licenses', caseDept:'GO',
+    searchFields:['type','business','id'],
+    columns:[{key:'type',label:'Rodzaj koncesji'},{key:'business',label:'Przedsiębiorstwo',type:'dim'},{key:'reg',label:'Data rejestracji',type:'mono'},{key:'exp',label:'Data wygaśnięcia',type:'mono'},{key:'status',label:'Status',type:'badge'},{key:'by',label:'Wydana przez',type:'dim'}],
+    formFields:[{key:'type',label:'Rodzaj koncesji'},{key:'business',label:'Przedsiębiorstwo'},{key:'exp',label:'Data wygaśnięcia (mm/dd/rrrr)'},{key:'status',label:'Status',type:'select',options:['Aktywna','Nieaktywna']}],
+    required:'type', beforeSave:(d,isEdit)=>{ if(!isEdit){ d.id = uid('GO/2026/0'); d.reg = todayStr(); d.by = CURRENT_USER.name; } } });
+}
+function renderTaxes(main){
+  genericRegistry(main, { title:'REJESTR PODATKÓW (PRZEDSIĘBIORSTWA)', dataKey:'taxes', moduleKey:'taxes', caseDept:'IRS',
+    searchFields:['business','type','case'],
+    columns:[{key:'business',label:'Przedsiębiorstwo'},{key:'type',label:'Rodzaj podatku',type:'dim'},{key:'amount',label:'Kwota / status podatku',type:'dim'},{key:'due',label:'Termin płatności',type:'mono'},{key:'by',label:'Zarejestrował',type:'dim'}],
+    formFields:[{key:'business',label:'Przedsiębiorstwo'},{key:'type',label:'Rodzaj podatku',type:'select',options:['Podatek zryczałtowany (10%)','Księga przych./rozch. (15%)']},{key:'amount',label:'Kwota / status podatku'},{key:'due',label:'Termin płatności (mm/dd/rrrr)'}],
+    required:'business', beforeSave:(d,isEdit)=>{ if(!isEdit) d.by = CURRENT_USER.name; } });
+}
+function renderVeterans(main){
+  genericRegistry(main, { title:'REJESTR WETERANÓW', dataKey:'veterans', moduleKey:'veterans', reverse:true, caseDept:'GO',
+    searchFields:['name','ssn'],
+    columns:[{key:'name',label:'Dane weterana'},{key:'ssn',label:'Numer SSN',type:'mono'},{key:'status',label:'Status',type:'badge'},{key:'reg',label:'Data rejestracji',type:'mono'},{key:'by',label:'Zarejestrował',type:'dim'}],
+    formFields:[{key:'name',label:'Imię i nazwisko'},{key:'ssn',label:'Numer SSN'},{key:'status',label:'Status',type:'select',options:['Aktywny','Nieaktywny']}],
+    required:'name', beforeSave:(d,isEdit)=>{ if(!isEdit){ d.reg = todayStr(); d.by = CURRENT_USER.name; } } });
+}
+function renderTaxis(main){
+  genericRegistry(main, { title:'REJESTR LICENCJI TAXI', dataKey:'taxis', moduleKey:'taxis', reverse:true, caseDept:'GO',
+    searchFields:['name','ssn','license'],
+    columns:[{key:'name',label:'Dane posiadacza'},{key:'license',label:'Numer licencji',type:'mono'},{key:'status',label:'Status',type:'badge'},{key:'issued',label:'Data wydania',type:'mono'},{key:'by',label:'Wydana przez',type:'dim'}],
+    formFields:[{key:'name',label:'Imię i nazwisko'},{key:'ssn',label:'Numer SSN'},{key:'status',label:'Status',type:'select',options:['Aktywna','Nieaktywna']}],
+    required:'name', beforeSave:(d,isEdit)=>{ if(!isEdit){ d.license='T'+Math.floor(100000+Math.random()*899999); d.issued=todayStr(); d.by=CURRENT_USER.name; } } });
+}
+function renderAttorneys(main){
+  genericRegistry(main, { title:'REJESTR ADWOKATÓW', dataKey:'attorneys', moduleKey:'attorneys', reverse:true, caseDept:'GO',
+    searchFields:['name','license'],
+    columns:[{key:'name',label:'Dane posiadacza'},{key:'license',label:'Nr licencji',type:'mono'},{key:'phone',label:'Nr tel.',type:'dim'},{key:'issued',label:'Data wydania',type:'mono'},{key:'exp',label:'Data wygaśnięcia',type:'mono'},{key:'status',label:'Status',type:'badge'},{key:'type',label:'Typ',type:'dim'}],
+    formFields:[{key:'name',label:'Imię i nazwisko'},{key:'phone',label:'Numer telefonu'},{key:'type',label:'Typ licencji',type:'select',options:['Publiczna','Prywatna']},{key:'status',label:'Status',type:'select',options:['Aktywna','Nieaktywna','Zawieszona']}],
+    required:'name', beforeSave:(d,isEdit)=>{
+      if(!isEdit){ const now=new Date(); const exp=new Date(now); exp.setMonth(exp.getMonth()+3); const p=n=>String(n).padStart(2,'0');
+        d.license = `${uid('').slice(0,4)}-${p(now.getMonth()+1)}${p(now.getDate())}2026-${Math.floor(100+Math.random()*899)}${['FN','MV','ZX','GK','AE'][Math.floor(Math.random()*5)]}`;
+        d.issued = todayStr(); d.exp = `${p(exp.getMonth()+1)}/${p(exp.getDate())}/${exp.getFullYear()}`; d.by = CURRENT_USER.name; } } });
+}
+
+/* ================= DEBTORS (grid) ================= */
+function renderDebtors(main){
+  if(!canRead('debtors')) return noAccessPanel(main,'Dłużnicy');
+  const writable = canWrite('debtors');
+  const panel = panelShell('DŁUŻNICY', `${DB.debtors.length} zarejestrowanych dłużników`, writable?'Dodaj':null, ()=>openDebtorModal(null));
+  const toolbar = document.createElement('div'); toolbar.className='toolbar'; toolbar.innerHTML=`<input class="search-input" id="debt-search" placeholder="Wyszukaj po imieniu i nazwisku lub numerze...">`;
+  panel.appendChild(toolbar);
+  const grid = document.createElement('div'); grid.className='grid'; panel.appendChild(grid); main.appendChild(panel);
+  function draw(){
+    let list = searchFilter(DB.debtors, document.getElementById('debt-search').value, ['name','contact']);
+    grid.innerHTML = list.length ? list.map((d)=>{ const idx = DB.debtors.indexOf(d); return `
+      <div class="card"><div class="card-top"><div><div class="card-title">${esc(d.name)}</div><div class="card-sub">[${esc(d.contact)}]</div></div><div style="font-size:20px">🙁</div></div>
+      <div class="card-body"><b>Numer kontaktowy:</b> ${esc(d.phone)}<br><b>Kwota zadłużenia:</b> <span style="color:var(--red)">$${Number(d.amount).toLocaleString('en-US')}</span><br><b>Deklaracja spłaty:</b> ${esc(d.due)}</div>
+      <div class="card-actions">${writable?`<button class="icon-btn" data-edit="${idx}">⚙</button><button class="icon-btn danger" data-del="${idx}">🗑</button>`:''}</div></div>`; }).join('')
+      : `<div class="empty-state" style="grid-column:1/-1"><div class="big">💸</div><div class="t1">Brak dłużników</div></div>`;
+    grid.querySelectorAll('[data-edit]').forEach(el=> el.onclick=()=>openDebtorModal(DB.debtors[Number(el.dataset.edit)]));
+    grid.querySelectorAll('[data-del]').forEach(el=> el.onclick=()=>{
+      confirmDelete('Czy na pewno chcesz usunąć ten wpis z rejestru dłużników?', ()=>{ DB.debtors.splice(Number(el.dataset.del),1); saveDB(); toast('Wpis usunięty.','ok'); draw(); });
+    });
+  }
+  document.getElementById('debt-search').addEventListener('input', draw);
+  draw();
+}
+function openDebtorModal(existing){
+  const isEdit = !!existing;
+  openModal(isEdit?'EDYTUJ DŁUŻNIKA':'DODAJ DŁUŻNIKA', `
+    <div class="form-row"><div class="field"><label>Imię i nazwisko</label><input id="f-name" value="${isEdit?existing.name:''}"></div>
+    <div class="field"><label>Numer identyfikacyjny</label><input id="f-contact" value="${isEdit?existing.contact:Math.floor(100+Math.random()*8999)}"></div></div>
+    <div class="form-row"><div class="field"><label>Numer kontaktowy</label><input id="f-phone" value="${isEdit?existing.phone:''}"></div>
+    <div class="field"><label>Kwota zadłużenia ($)</label><input id="f-amount" type="number" value="${isEdit?existing.amount:''}"></div></div>
+    <div class="field"><label>Deklaracja spłaty (mm/dd/rrrr)</label><input id="f-due" value="${isEdit?existing.due:''}"></div>
+  `, `<button class="btn-ghost" onclick="closeModal()">Anuluj</button><button class="btn-add" id="save-debt-btn">${isEdit?'Zapisz zmiany':'Dodaj dłużnika'}</button>`);
+  document.getElementById('save-debt-btn').onclick = ()=>{
+    const name = document.getElementById('f-name').value.trim();
+    if(!name){ toast('Podaj imię i nazwisko.','err'); return; }
+    const data = { name, contact:document.getElementById('f-contact').value.trim(), phone:document.getElementById('f-phone').value.trim(),
+      amount:Number(document.getElementById('f-amount').value)||0, due:document.getElementById('f-due').value.trim() };
+    if(isEdit) Object.assign(existing, data); else DB.debtors.unshift(data);
+    saveDB(); closeModal(); toast(isEdit?'Dane zaktualizowane.':'Dłużnik dodany do rejestru.','ok'); navigate('debtors');
+  };
+}
+
+/* ================= COURT HEARINGS ================= */
+function renderHearings(main){
+  if(!canRead('hearings')) return noAccessPanel(main,'Rozprawy sądowe');
+  const writable = canWrite('hearings');
+  const showCases = canRead('cases');
+  const panel = panelShell('ROZPRAWY AKTUALNE', null, writable?'Dodaj':null, openAddHearingModal);
+  const upcoming = DB.hearings.filter(h=>h.status!=='Zakończona');
+  const body1 = document.createElement('div');
+  body1.innerHTML = upcoming.length ? `<table><tbody>${upcoming.map((h,i)=>{ const idx = DB.hearings.indexOf(h); return `<tr><td><b>${esc(h.plaintiff)} v. ${esc(h.defendant)}</b><div class="dim" style="margin-top:3px">${esc(h.type)} — <a href="#" data-open="${esc(h.related)}">${esc(h.related)}</a></div>${showCases?`<div style="margin-top:6px" data-caselink-idx="${idx}">${caseLinkCell(h)}</div>`:''}</td><td class="mono" style="text-align:right;white-space:nowrap">${esc(h.datetime)}</td></tr>`; }).join('')}</tbody></table>`
+    : `<div class="empty-state"><div class="t1" style="font-style:italic">Brak aktualnych rozpraw.</div></div>`;
+  panel.appendChild(body1); main.appendChild(panel);
+
+  const archivePanel = panelShell('ARCHIWUM', `${DB.hearings.length} rozpraw w archiwum`);
+  const body2 = document.createElement('div');
+  const past = [...DB.hearings].reverse();
+  body2.innerHTML = past.length ? past.map(h=>{ const idx = DB.hearings.indexOf(h); return `<div class="doc-item" style="align-items:flex-start"><div class="di-name"><div class="di-meta" style="margin-bottom:3px">${esc(h.datetime)} — ${badgeFor(h.status)}</div><b>${esc(h.plaintiff)} v. ${esc(h.defendant)}</b> — <a href="#" data-open="${esc(h.related)}">${esc(h.related)}</a><br><span class="dim" style="font-size:11px">${esc(h.type)} (${esc(h.publicity)})</span>${showCases?`<div style="margin-top:6px" data-caselink-idx="${idx}">${caseLinkCell(h)}</div>`:''}</div></div>`; }).join('')
+    : `<div class="empty-state"><div class="t1" style="font-style:italic">Archiwum jest puste.</div></div>`;
+  archivePanel.appendChild(body2); main.appendChild(archivePanel);
+  main.querySelectorAll('[data-open]').forEach(el=> el.onclick=(e)=>{ e.preventDefault(); if(DB.cases.find(c=>c.id===el.dataset.open) && canRead('cases')) navigate('caseDetail', el.dataset.open); });
+  if(showCases) main.querySelectorAll('[data-caselink-idx]').forEach(cell=> wireCaseLinkCell(cell, DB.hearings[Number(cell.dataset.caselinkIdx)], 'SC'));
+}
+function openAddHearingModal(){
+  openModal('DODAJ ROZPRAWĘ', `
+    <div class="form-row"><div class="field"><label>Rodzaj rozprawy</label><select id="h-type"><option>Sprawa karna</option><option>Sprawa cywilna</option><option>Spotkanie przedprocesowe</option></select></div>
+    <div class="field"><label>Jawność rozprawy</label><select id="h-pub"><option>Jawne</option><option>Niejawne</option></select></div></div>
+    <div class="form-row"><div class="field"><label>Powód</label><input id="h-plaintiff" value="People of the State of San Andreas"></div>
+    <div class="field"><label>Pozwany</label><input id="h-defendant" placeholder="Imię i nazwisko"></div></div>
+    <div class="form-row"><div class="field"><label>Data i godzina</label><input id="h-datetime" type="datetime-local"></div>
+    <div class="field"><label>Sędzia prowadzący</label><input id="h-judge" value="${CURRENT_USER.name}"></div></div>
+    <div class="field"><label>Powiązana sprawa (sygnatura)</label><input id="h-related" placeholder="np. SC/2026/01099"></div>
+  `, `<button class="btn-ghost" onclick="closeModal()">Anuluj</button><button class="btn-add" id="save-hearing-btn">Dodaj rozprawę</button>`);
+  document.getElementById('save-hearing-btn').onclick = ()=>{
+    const defendant = document.getElementById('h-defendant').value.trim();
+    if(!defendant){ toast('Podaj dane pozwanego.','err'); return; }
+    const dtRaw = document.getElementById('h-datetime').value;
+    let dtLabel = todayStr();
+    if(dtRaw){ const d=new Date(dtRaw); const p=n=>String(n).padStart(2,'0'); dtLabel = `${p(d.getMonth()+1)}/${p(d.getDate())}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`; }
+    DB.hearings.unshift({ type:document.getElementById('h-type').value, publicity:document.getElementById('h-pub').value,
+      plaintiff:document.getElementById('h-plaintiff').value.trim(), defendant, datetime:dtLabel,
+      judge:document.getElementById('h-judge').value.trim(), related:document.getElementById('h-related').value.trim()||'—', status:'Zaplanowana' });
+    saveDB(); closeModal(); toast('Rozprawa dodana do kalendarza.','ok'); navigate('hearings');
+  };
+}
+
+/* ================= GANG DATABASE ================= */
+function renderGangs(main){
+  if(!canRead('gangs')) return noAccessPanel(main,'SA Gang Database');
+  const writable = canWrite('gangs');
+  const wrap = document.createElement('div'); wrap.className='split-two';
+  const leftPanel = panelShell('CZŁONKOWIE', `${DB.gangMembers.length} rekordów`, writable?'Dodaj':null, ()=>openGangMemberModal(null));
+  const searchL = document.createElement('div'); searchL.className='toolbar'; searchL.innerHTML=`<input class="search-input" id="gm-search" placeholder="Wyszukaj...">`;
+  leftPanel.appendChild(searchL); const listL = document.createElement('div'); leftPanel.appendChild(listL);
+  const rightPanel = panelShell('GRUPY', `${DB.gangGroups.length} zarejestrowanych grup`, writable?'Dodaj':null, ()=>openGangGroupModal(null));
+  const searchR = document.createElement('div'); searchR.className='toolbar'; searchR.innerHTML=`<input class="search-input" id="gg-search" placeholder="Wyszukaj...">`;
+  rightPanel.appendChild(searchR); const listR = document.createElement('div'); rightPanel.appendChild(listR);
+  wrap.appendChild(leftPanel); wrap.appendChild(rightPanel); main.appendChild(wrap);
+
+  const showCases = canRead('cases');
+  function drawL(){
+    const list = searchFilter(DB.gangMembers, document.getElementById('gm-search').value, ['name','ssn','group']);
+    listL.innerHTML = list.length ? list.map(m=>{ const idx = DB.gangMembers.indexOf(m); return `<div class="doc-item" style="align-items:flex-start">
+      <div class="di-name"><b>${esc(m.name)}</b> [SSN: ${esc(m.ssn)}] — ${esc(m.group)} <span class="dim">(${esc(m.role)})</span><br><span class="di-meta">${m.registered?'zarejestrowany':'niezarejestrowany'}</span>
+      ${showCases?`<div style="margin-top:6px" data-caselink-idx="${idx}">${caseLinkCell(m)}</div>`:''}</div>
+      <div class="row-actions">${writable?`<button class="icon-btn" data-edit="${idx}">⚙</button><button class="icon-btn danger" data-del="${idx}">🗑</button>`:''}</div></div>`; }).join('')
+      : `<div class="empty-state"><div class="t1" style="font-style:italic">Baza jest pusta.</div></div>`;
+    listL.querySelectorAll('[data-edit]').forEach(el=> el.onclick=()=>openGangMemberModal(DB.gangMembers[Number(el.dataset.edit)]));
+    listL.querySelectorAll('[data-del]').forEach(el=> el.onclick=()=>{ confirmDelete('Usunąć ten rekord z bazy członków?', ()=>{ DB.gangMembers.splice(Number(el.dataset.del),1); saveDB(); toast('Rekord usunięty.','ok'); drawL(); }); });
+    if(showCases) listL.querySelectorAll('[data-caselink-idx]').forEach(cell=> wireCaseLinkCell(cell, DB.gangMembers[Number(cell.dataset.caselinkIdx)], 'GO'));
+  }
+  function drawR(){
+    const list = searchFilter(DB.gangGroups, document.getElementById('gg-search').value, ['name']);
+    listR.innerHTML = list.length ? list.map(g=>{ const idx = DB.gangGroups.indexOf(g); return `<div class="doc-item" style="align-items:flex-start">
+      <div class="di-name"><b>${esc(g.name)}</b> — ${esc(g.members)} członków<br><span class="di-meta">${g.registered?'zarejestrowana':'niezarejestrowana'}</span>
+      ${showCases?`<div style="margin-top:6px" data-caselink-idx="${idx}">${caseLinkCell(g)}</div>`:''}</div>
+      <div class="row-actions">${writable?`<button class="icon-btn" data-edit="${idx}">⚙</button><button class="icon-btn danger" data-del="${idx}">🗑</button>`:''}</div></div>`; }).join('')
+      : `<div class="empty-state"><div class="t1" style="font-style:italic">Baza jest pusta.</div></div>`;
+    listR.querySelectorAll('[data-edit]').forEach(el=> el.onclick=()=>openGangGroupModal(DB.gangGroups[Number(el.dataset.edit)]));
+    listR.querySelectorAll('[data-del]').forEach(el=> el.onclick=()=>{ confirmDelete('Usunąć tę grupę z bazy?', ()=>{ DB.gangGroups.splice(Number(el.dataset.del),1); saveDB(); toast('Grupa usunięta.','ok'); drawR(); }); });
+    if(showCases) listR.querySelectorAll('[data-caselink-idx]').forEach(cell=> wireCaseLinkCell(cell, DB.gangGroups[Number(cell.dataset.caselinkIdx)], 'GO'));
+  }
+  document.getElementById('gm-search').addEventListener('input', drawL);
+  document.getElementById('gg-search').addEventListener('input', drawR);
+  drawL(); drawR();
+}
+function openGangMemberModal(existing){
+  const isEdit = !!existing;
+  openModal(isEdit?'EDYTUJ CZŁONKA':'DODAJ CZŁONKA', `
+    <div class="form-row"><div class="field"><label>Imię i nazwisko</label><input id="f-name" value="${isEdit?existing.name:''}"></div>
+    <div class="field"><label>Numer SSN</label><input id="f-ssn" value="${isEdit?existing.ssn:Math.floor(100+Math.random()*8999)}"></div></div>
+    <div class="form-row"><div class="field"><label>Grupa</label><input id="f-group" value="${isEdit?existing.group:''}"></div>
+    <div class="field"><label>Rola</label><select id="f-role"><option ${isEdit&&existing.role==='Lider'?'selected':''}>Lider</option><option ${isEdit&&existing.role==='Członek'?'selected':''}>Członek</option></select></div></div>
+  `, `<button class="btn-ghost" onclick="closeModal()">Anuluj</button><button class="btn-add" id="save-gm-btn">${isEdit?'Zapisz zmiany':'Dodaj wpis'}</button>`);
+  document.getElementById('save-gm-btn').onclick = ()=>{
+    const name = document.getElementById('f-name').value.trim();
+    if(!name){ toast('Podaj imię i nazwisko.','err'); return; }
+    const data = {name, ssn:document.getElementById('f-ssn').value.trim(), group:document.getElementById('f-group').value.trim(), role:document.getElementById('f-role').value, registered:isEdit?existing.registered:false};
+    if(isEdit) Object.assign(existing,data); else DB.gangMembers.unshift(data);
+    saveDB(); closeModal(); toast('Zapisano.','ok'); navigate('gangs');
+  };
+}
+function openGangGroupModal(existing){
+  const isEdit = !!existing;
+  openModal(isEdit?'EDYTUJ GRUPĘ':'DODAJ GRUPĘ', `
+    <div class="field"><label>Nazwa grupy</label><input id="f-name" value="${isEdit?existing.name:''}"></div>
+    <div class="form-row"><div class="field"><label>Liczba członków</label><input id="f-members" type="number" value="${isEdit?existing.members:0}"></div>
+    <div class="field"><label>Status</label><select id="f-reg"><option value="false" ${isEdit&&!existing.registered?'selected':''}>Niezarejestrowana</option><option value="true" ${isEdit&&existing.registered?'selected':''}>Zarejestrowana</option></select></div></div>
+  `, `<button class="btn-ghost" onclick="closeModal()">Anuluj</button><button class="btn-add" id="save-gg-btn">${isEdit?'Zapisz zmiany':'Dodaj grupę'}</button>`);
+  document.getElementById('save-gg-btn').onclick = ()=>{
+    const name = document.getElementById('f-name').value.trim();
+    if(!name){ toast('Podaj nazwę grupy.','err'); return; }
+    const data = {name, members:Number(document.getElementById('f-members').value)||0, registered:document.getElementById('f-reg').value==='true'};
+    if(isEdit) Object.assign(existing,data); else DB.gangGroups.unshift(data);
+    saveDB(); closeModal(); toast('Zapisano.','ok'); navigate('gangs');
+  };
+}
+
+/* ================= POCZTA / WNIOSKI (per-department inbox) ================= */
+function renderPostal(main){
+  const myDept = CURRENT_USER.department;
+  const tabs = document.createElement('div'); tabs.className='panel';
+  tabs.innerHTML = `<div class="tab-row">
+      <div class="tab-btn ${postalTab==='inbox'?'active':''}" data-tab="inbox">Skrzynka odbiorcza${CURRENT_USER.isAdmin?' (wszystkie działy)':` — ${deptName(myDept)}`}</div>
+      <div class="tab-btn ${postalTab==='compose'?'active':''}" data-tab="compose">Nowy wniosek</div>
+      <div class="tab-btn ${postalTab==='sent'?'active':''}" data-tab="sent">Wysłane przeze mnie</div>
+    </div>`;
+  const body = document.createElement('div');
+  tabs.appendChild(body);
+  main.appendChild(tabs);
+
+  tabs.querySelectorAll('[data-tab]').forEach(el=> el.onclick=()=>{ postalTab = el.dataset.tab; renderMain(); });
+
+  if(postalTab==='inbox'){
+    let list = [...DB.postal].reverse().filter(p=> CURRENT_USER.isAdmin || p.toDept===myDept);
+    let filterHtml = '';
+    if(CURRENT_USER.isAdmin){
+      filterHtml = `<div class="toolbar"><select class="filter-select" id="postal-dept-filter"><option value="">Wszystkie departamenty</option>${DEPARTMENTS.map(d=>`<option value="${d.key}">${d.name}</option>`).join('')}</select></div>`;
+    }
+    const wrap = document.createElement('div'); wrap.innerHTML = filterHtml;
+    const listWrap = document.createElement('div');
+    wrap.appendChild(listWrap);
+    body.appendChild(wrap);
+
+    function draw(){
+      let filtered = list;
+      if(CURRENT_USER.isAdmin){
+        const dv = document.getElementById('postal-dept-filter');
+        if(dv && dv.value) filtered = list.filter(p=>p.toDept===dv.value);
+      }
+      listWrap.innerHTML = filtered.length ? filtered.map(p=>{
+        const idx = DB.postal.indexOf(p);
+        return `<div class="doc-item" style="align-items:flex-start">
+          <div class="di-name">
+            <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">${badgeFor(p.status)}<span class="di-meta">${p.createdAt}</span>
+              <span class="badge badge-purple">${deptName(p.toDept)}</span></div>
+            <b>${esc(p.title)}</b><br>
+            <span class="dim" style="font-size:11.5px">Od: ${esc(p.fromName)} (${esc(deptName(p.fromDept))})</span><br>
+            <span style="font-size:12px;color:var(--text-dim)">${esc(p.content)}</span>
+            ${p.note ? `<div style="margin-top:6px;font-size:11.5px;color:var(--amber)"><b>Notatka zwrotna:</b> ${p.note}</div>` : ''}
+          </div>
+          <div class="row-actions">
+            ${p.status==='Oczekujący' ? `<button class="icon-btn ok" data-accept="${idx}" title="Przyjmij wniosek">✓</button><button class="icon-btn danger" data-return="${idx}" title="Odeślij wniosek">↩</button>` : ''}
+          </div>
+        </div>`;
+      }).join('') : `<div class="empty-state"><div class="big">✉</div><div class="t1">Skrzynka jest pusta</div><div class="t2">Brak wniosków skierowanych do tego departamentu.</div></div>`;
+      listWrap.querySelectorAll('[data-accept]').forEach(el=> el.onclick=()=>{
+        const p = DB.postal[Number(el.dataset.accept)]; p.status='Przyjęty'; p.respondedBy=CURRENT_USER.name; p.respondedAt=nowStamp();
+        saveDB(); toast('Wniosek przyjęty.','ok'); renderMain();
+      });
+      listWrap.querySelectorAll('[data-return]').forEach(el=> el.onclick=()=>{
+        const p = DB.postal[Number(el.dataset.return)];
+        openModal('ODEŚLIJ WNIOSEK', `<div class="field"><label>Powód odesłania</label><textarea id="ret-note" placeholder="Podaj powód odesłania wniosku..."></textarea></div>`,
+          `<button class="btn-ghost" onclick="closeModal()">Anuluj</button><button class="btn-danger-fill" id="confirm-ret-btn">Odeślij wniosek</button>`);
+        document.getElementById('confirm-ret-btn').onclick = ()=>{
+          p.status='Odesłany'; p.note=document.getElementById('ret-note').value.trim(); p.respondedBy=CURRENT_USER.name; p.respondedAt=nowStamp();
+          saveDB(); closeModal(); toast('Wniosek odesłany.','err'); renderMain();
+        };
+      });
+    }
+    if(CURRENT_USER.isAdmin) document.getElementById('postal-dept-filter').addEventListener('change', draw);
+    draw();
+  }
+
+  if(postalTab==='compose'){
+    const wrap = document.createElement('div'); wrap.style.padding='18px 18px 20px';
+    wrap.innerHTML = `
+      <div class="field"><label>Tytuł wniosku</label><input id="p-title" placeholder="np. Wniosek o wydanie nakazu przeszukania"></div>
+      <div class="field"><label>Treść wniosku</label><textarea id="p-content" placeholder="Opisz szczegóły wniosku..." style="min-height:130px"></textarea></div>
+      <div class="field"><label>Departament docelowy</label>
+        <select id="p-to">${DEPARTMENTS.map(d=>`<option value="${d.key}">${d.name}</option>`).join('')}</select>
+      </div>
+      <button class="btn-add" id="send-postal-btn" style="margin-top:6px">📨 Wyślij wniosek</button>
+    `;
+    body.appendChild(wrap);
+    document.getElementById('send-postal-btn').onclick = ()=>{
+      const title = document.getElementById('p-title').value.trim();
+      const content = document.getElementById('p-content').value.trim();
+      if(!title || !content){ toast('Uzupełnij tytuł i treść wniosku.','err'); return; }
+      DB.postal.push({ id: uid('WN-'), title, content, toDept:document.getElementById('p-to').value,
+        fromLogin:CURRENT_USER.login, fromName:CURRENT_USER.name, fromDept:myDept, status:'Oczekujący', createdAt: nowStamp() });
+      saveDB(); toast('Wniosek wysłany.','ok'); postalTab='sent'; navigate('postal');
+    };
+  }
+
+  if(postalTab==='sent'){
+    let list = [...DB.postal].reverse().filter(p=>p.fromLogin===CURRENT_USER.login);
+    const listWrap = document.createElement('div');
+    listWrap.innerHTML = list.length ? list.map(p=>`
+      <div class="doc-item" style="align-items:flex-start">
+        <div class="di-name">
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">${badgeFor(p.status)}<span class="di-meta">${p.createdAt}</span><span class="badge badge-blue">do: ${deptName(p.toDept)}</span></div>
+          <b>${esc(p.title)}</b><br><span style="font-size:12px;color:var(--text-dim)">${esc(p.content)}</span>
+          ${p.respondedBy ? `<div style="margin-top:6px;font-size:11.5px;color:var(--text-faint)">Rozpatrzone przez: ${p.respondedBy} — ${p.respondedAt}</div>`:''}
+          ${p.note ? `<div style="margin-top:4px;font-size:11.5px;color:var(--amber)"><b>Notatka:</b> ${p.note}</div>`:''}
+        </div>
+      </div>`).join('') : `<div class="empty-state"><div class="big">📤</div><div class="t1">Nie wysłałeś jeszcze żadnych wniosków</div></div>`;
+    body.appendChild(listWrap);
+  }
+}
+
+/* ================= USTAWIENIA (panel administratora) ================= */
+function renderSettings(main){
+  if(!CURRENT_USER.isAdmin){ return noAccessPanel(main,'Ustawienia'); }
+
+  const stat = document.createElement('div'); stat.className='panel';
+  stat.innerHTML = `<div class="panel-head"><div><h2>PANEL ADMINISTRACYJNY</h2><div class="meta">Zarządzanie kontami urzędników i ich uprawnieniami</div></div></div>
+    <div class="stat-strip">
+      <div class="stat-box"><div class="num">${DB.users.length}</div><div class="lbl">Kont w systemie</div></div>
+      <div class="stat-box"><div class="num">${DB.users.filter(u=>u.isAdmin).length}</div><div class="lbl">Administratorów</div></div>
+      <div class="stat-box"><div class="num">${DB.postal.filter(p=>p.status==='Oczekujący').length}</div><div class="lbl">Wniosków oczekujących</div></div>
+      <div class="stat-box"><div class="num">${DEPARTMENTS.length}</div><div class="lbl">Departamentów</div></div>
+    </div>`;
+  main.appendChild(stat);
+
+  const panel = panelShell('UŻYTKOWNICY SYSTEMU', 'Osoby posiadające dostęp do portalu State Capitol', 'Dodaj użytkownika', ()=>openUserModal(null));
+  const body = document.createElement('div');
+  panel.appendChild(body);
+  main.appendChild(panel);
+
+  function permSummary(u){
+    if(u.isAdmin) return `<span class="perm-pill pp-write">PEŁNY DOSTĘP (ADMIN)</span>`;
+    const writes = MODULES.filter(m=> u.permissions && u.permissions[m.key]==='write');
+    const reads = MODULES.filter(m=> u.permissions && u.permissions[m.key]==='read');
+    if(!writes.length && !reads.length) return `<span class="dim" style="font-size:11.5px">brak nadanych uprawnień</span>`;
+    return writes.map(m=>`<span class="perm-pill pp-write">${m.label}: zapis</span>`).join('') + reads.map(m=>`<span class="perm-pill pp-read">${m.label}: odczyt</span>`).join('');
+  }
+
+  function draw(){
+    body.innerHTML = `<table>
+      <thead><tr><th>Imię i nazwisko</th><th>Login</th><th>Stanowisko</th><th>Departament</th><th>Uprawnienia</th><th></th></tr></thead>
+      <tbody>${DB.users.map((u,idx)=>`
+        <tr>
+          <td><b>${esc(u.name)}</b>${u.isAdmin?' <span class="badge badge-purple">ADMIN</span>':''}</td>
+          <td class="mono">${esc(u.login)}</td>
+          <td class="dim">${esc(u.title)||'—'}</td>
+          <td><span class="badge badge-blue">${deptName(u.department)}</span></td>
+          <td style="max-width:340px">${permSummary(u)}</td>
+          <td><div class="row-actions">
+            <button class="icon-btn" data-edit="${idx}">⚙</button>
+            ${u.login!==CURRENT_USER.login ? `<button class="icon-btn danger" data-del="${idx}">🗑</button>` : ''}
+          </div></td>
+        </tr>`).join('')}</tbody></table>`;
+    body.querySelectorAll('[data-edit]').forEach(el=> el.onclick=()=>openUserModal(DB.users[Number(el.dataset.edit)]));
+    body.querySelectorAll('[data-del]').forEach(el=> el.onclick=()=>{
+      const u = DB.users[Number(el.dataset.del)];
+      if(u.isAdmin && DB.users.filter(x=>x.isAdmin).length<=1){ toast('Nie można usunąć jedynego administratora systemu.','err'); return; }
+      confirmDelete(`Czy na pewno chcesz trwale usunąć konto <b>${u.name}</b> (${u.login})? Utraci ono dostęp do systemu.`, ()=>{
+        DB.users.splice(Number(el.dataset.del),1); saveDB(); toast('Konto użytkownika usunięte.','ok'); draw();
+      });
+    });
+  }
+  draw();
+}
+
+function openUserModal(existing){
+  const isEdit = !!existing;
+  const perms = isEdit ? existing.permissions : emptyPermissions();
+  openModal(isEdit?`EDYTUJ UŻYTKOWNIKA — ${existing.name}`:'DODAJ UŻYTKOWNIKA', `
+    <div class="form-row">
+      <div class="field"><label>Imię i nazwisko</label><input id="u-name" value="${isEdit?esc(existing.name):''}"></div>
+      <div class="field"><label>Stanowisko</label><input id="u-title" value="${isEdit?esc(existing.title||''):''}" placeholder="np. Zastępca Prokuratora"></div>
+    </div>
+    <div class="form-row">
+      <div class="field"><label>Login</label><input id="u-login" value="${isEdit?esc(existing.login):''}"></div>
+      <div class="field"><label>Hasło${isEdit?' (zostaw puste, aby nie zmieniać)':''}</label><input type="password" id="u-pass" value="" autocomplete="new-password" placeholder="${isEdit?'••••••••':'Ustaw hasło dostępu'}"></div>
+    </div>
+    <div class="form-row">
+      <div class="field"><label>Departament (routing Poczty)</label>
+        <select id="u-dept">${DEPARTMENTS.map(d=>`<option value="${d.key}" ${isEdit&&existing.department===d.key?'selected':''}>${d.name}</option>`).join('')}</select>
+      </div>
+      <div class="field"><label>Rola w systemie</label>
+        <select id="u-admin"><option value="false" ${isEdit&&!existing.isAdmin?'selected':''}>Urzędnik (uprawnienia wg tabeli poniżej)</option><option value="true" ${isEdit&&existing.isAdmin?'selected':''}>Administrator systemu (pełny dostęp)</option></select>
+      </div>
+    </div>
+    <div class="field" id="perm-matrix-wrap">
+      <label>Uprawnienia do modułów</label>
+      <table class="perm-matrix">
+        <thead><tr><th>Moduł</th><th style="width:150px">Poziom dostępu</th></tr></thead>
+        <tbody>${MODULES.map(m=>`
+          <tr><td>${m.label}</td><td>
+            <select id="perm-${m.key}">
+              <option value="none" ${perms[m.key]==='none'?'selected':''}>Brak dostępu</option>
+              <option value="read" ${perms[m.key]==='read'?'selected':''}>Odczyt</option>
+              <option value="write" ${perms[m.key]==='write'?'selected':''}>Odczyt i zapis</option>
+            </select>
+          </td></tr>`).join('')}</tbody>
+      </table>
+    </div>
+  `, `<button class="btn-ghost" onclick="closeModal()">Anuluj</button><button class="btn-add" id="save-user-btn">${isEdit?'Zapisz zmiany':'Utwórz konto'}</button>`);
+
+  const adminSel = document.getElementById('u-admin');
+  const matrixWrap = document.getElementById('perm-matrix-wrap');
+  function syncMatrixVisibility(){ matrixWrap.style.display = adminSel.value==='true' ? 'none' : 'block'; }
+  adminSel.addEventListener('change', syncMatrixVisibility);
+  syncMatrixVisibility();
+
+  document.getElementById('save-user-btn').onclick = async ()=>{
+    const name = document.getElementById('u-name').value.trim();
+    const login = document.getElementById('u-login').value.trim();
+    const pass = document.getElementById('u-pass').value; // bez trim — hasło może celowo zawierać spacje
+    if(!name || !login || (!isEdit && !pass)){ toast('Uzupełnij imię i nazwisko, login oraz hasło.','err'); return; }
+    if(pass && pass.length < 6){ toast('Hasło musi mieć co najmniej 6 znaków.','err'); return; }
+    const dupe = DB.users.find(u=> u.login.toLowerCase()===login.toLowerCase() && u!==existing);
+    if(dupe){ toast('Ten login jest już zajęty przez inne konto.','err'); return; }
+    const isAdminVal = document.getElementById('u-admin').value === 'true';
+    const newPerms = emptyPermissions();
+    MODULES.forEach(m=>{ const sel = document.getElementById('perm-'+m.key); if(sel) newPerms[m.key] = sel.value; });
+    const data = { name, title:document.getElementById('u-title').value.trim(), login,
+      department:document.getElementById('u-dept').value, isAdmin:isAdminVal, permissions:newPerms };
+    const btn = document.getElementById('save-user-btn'); btn.disabled = true;
+    if(isEdit){
+      if(existing.isAdmin && !isAdminVal && DB.users.filter(u=>u.isAdmin).length<=1){ toast('Nie można odebrać uprawnień administratora jedynemu adminowi.','err'); btn.disabled=false; return; }
+      Object.assign(existing, data);
+      if(pass) await setUserPassword(existing, pass);
+      if(existing.login===CURRENT_USER.login) CURRENT_USER = existing;
+    } else {
+      data.created = nowStamp();
+      await setUserPassword(data, pass);
+      DB.users.push(data);
+    }
+    saveDB(); closeModal(); toast(isEdit?'Konto zaktualizowane.':'Nowe konto utworzone.','ok'); navigate('settings');
+  };
+}
+
+/* -------------------- BOOT -------------------- */
+function updateClock(){
+  const d = new Date(); const p=n=>String(n).padStart(2,'0');
+  document.getElementById('clock').textContent = `Los Santos, San Andreas · ${p(d.getMonth()+1)}/${p(d.getDate())}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+}
+let idleTimer = null;
+function resetIdleTimer(){
+  if(!CURRENT_USER) return;
+  if(idleTimer) clearTimeout(idleTimer);
+  idleTimer = setTimeout(()=>{ toast('Sesja wygasła z powodu braku aktywności.','err'); setTimeout(logout, 900); }, IDLE_LIMIT_MS);
+}
+['mousemove','keydown','mousedown','scroll','touchstart'].forEach(evt=> document.addEventListener(evt, resetIdleTimer, {passive:true}));
+
+function enterApp(){
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').classList.add('active');
+  document.getElementById('cur-user-name').textContent = CURRENT_USER.name;
+  document.getElementById('cur-user-role').textContent = CURRENT_USER.title || (CURRENT_USER.isAdmin?'Administrator systemu':deptName(CURRENT_USER.department));
+  document.getElementById('cur-user-avatar').textContent = CURRENT_USER.name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+  navigate(CURRENT_USER.isAdmin ? 'postal' : 'postal');
+  updateClock();
+  setInterval(updateClock, 1000);
+  resetIdleTimer();
+}
+document.getElementById('login-form').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const u = document.getElementById('login-user').value;
+  const p = document.getElementById('login-pass').value;
+  const errEl = document.getElementById('login-error');
+  const btn = e.target.querySelector('button[type="submit"]');
+  const origLabel = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Weryfikacja danych...';
+  const res = await tryLogin(u, p);
+  btn.disabled = false; btn.textContent = origLabel;
+  if(res.ok){ errEl.style.display='none'; enterApp(); }
+  else{
+    errEl.textContent = res.locked
+      ? `Zbyt wiele nieudanych prób logowania. Konto tymczasowo zablokowane — spróbuj ponownie za ${res.secs}s.`
+      : 'Nieprawidłowy login lub hasło.';
+    errEl.style.display='block';
+    document.getElementById('login-pass').value='';
+  }
+});
+document.getElementById('btn-logout').addEventListener('click', logout);
+
+(async function init(){
+  loadDB();
+  await migrateLegacyPasswords();
+  if(restoreSession()){ enterApp(); }
+})();
+</script>
+</body>
+</html>
